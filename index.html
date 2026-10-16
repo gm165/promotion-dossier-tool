@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Promotion Certificates & Result Comparison</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #f0f2f5;
+            color: #000;
+            margin: 0;
+            padding: 10px;
+            line-height: 1.5;
+        }
+        .no-print {
+            background: #ffffff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 950px;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        .no-print h3 {
+            margin-top: 0;
+            color: #1a365d;
+            font-size: 18px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        .form-group label {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #333;
+        }
+        .form-group input, .form-group select {
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .print-btn {
+            grid-column: span 2;
+            background-color: #2563eb;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 5px;
+            width: 100%;
+        }
+        .print-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Certificate Page Layout */
+        .certificate-page {
+            background: white;
+            width: 100%;
+            max-width: 210mm;
+            height: 270mm;
+            padding: 15mm 20mm 15mm 20mm;
+            margin: 0 auto 20px auto;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            break-after: page;
+            break-inside: avoid;
+            overflow: hidden;
+        }
+
+        .header-box {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        .header-box h2 {
+            margin: 0;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+        .header-box h3 {
+            margin: 4px 0 0 0;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .cert-title {
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 15px 0 15px 0;
+            text-transform: uppercase;
+        }
+
+        .cert-body {
+            font-size: 14px;
+            text-align: justify;
+            margin-bottom: 30px;
+        }
+        .cert-body ol {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+        .cert-body li {
+            margin-bottom: 6px;
+        }
+
+        .signature-section {
+            position: absolute;
+            bottom: 22mm;
+            right: 20mm;
+            text-align: left;
+            width: 240px;
+        }
+        .signature-section p {
+            margin: 2px 0;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* Brand Footer */
+        .brand-footer {
+            position: absolute;
+            bottom: 8mm;
+            left: 20mm;
+            right: 20mm;
+            text-align: center;
+            font-size: 11px;
+            color: #555;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 4px;
+        }
+
+        /* Tabs and Comparison Panel Styling */
+        .tab-bar {
+            max-width: 950px; margin: 0 auto 14px; display: flex;
+            flex-wrap: wrap; gap: 8px;
+        }
+        .tab-button {
+            border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;
+            color: #1e293b; padding: 11px 16px; font-weight: bold; cursor: pointer;
+        }
+        .tab-button.active { color: #fff; background: #1d4ed8; border-color: #1d4ed8; }
+        
+        .comparison-panel {
+            display: none; max-width: 950px; margin: 0 auto 20px; background: #fff;
+            padding: 18px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.1);
+            box-sizing: border-box;
+        }
+        .comparison-panel h2, .comparison-report h2, .comparison-report h3 {
+            color: #1e3a5f; margin-top: 0;
+        }
+        .comparison-table-input {
+            width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;
+        }
+        .comparison-table-input th, .comparison-table-input td {
+            border: 1px solid #cbd5e1; padding: 8px; text-align: center;
+        }
+        .comparison-table-input th { background: #f8fafc; }
+        .comparison-table-input input {
+            width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;
+        }
+        .add-year-btn {
+            background-color: #16a34a; color: white; border: none; padding: 8px 14px;
+            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 10px;
+        }
+        .add-year-btn:hover { background-color: #15803d; }
+        .backup-btn {
+            background-color: #0284c7; color: white; border: none; padding: 8px 14px;
+            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 10px; margin-left: 5px;
+        }
+        .backup-btn:hover { background-color: #0369a1; }
+        .restore-btn {
+            background-color: #d97706; color: white; border: none; padding: 8px 14px;
+            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 10px; margin-left: 5px;
+        }
+        .restore-btn:hover { background-color: #b45309; }
+        .del-row-btn {
+            background-color: #dc2626; color: white; border: none; padding: 4px 8px;
+            border-radius: 3px; cursor: pointer; font-size: 11px;
+        }
+        .del-row-btn:hover { background-color: #b91c1c; }
+
+        .comparison-report {
+            display: none; max-width: 210mm; margin: 0 auto 20px; background: #fff;
+            padding: 15mm 20mm 15mm 20mm; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,.1);
+            position: relative;
+            height: 270mm;
+            overflow: hidden;
+        }
+        .comparison-report h2, .comparison-report h3 { text-align: center; margin: 5px 0; }
+        .comparison-report .report-meta { text-align: center; margin: 8px 0 18px; font-size: 14px; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        .comparison-table th, .comparison-table td { border: 1px solid #64748b; padding: 8px; text-align: center; }
+        .comparison-table th { background: #e2e8f0; }
+
+        .hidden-view { display: none !important; }
+
+        /* Print Adjustments to Prevent Blank Pages */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            body { background: none; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            
+            body.print-comparison .certificate-page,
+            body.print-comparison #certificate-controls,
+            body.print-comparison .tab-bar { display: none !important; }
+            body.print-comparison #comparison-controls { display: none !important; }
+            
+            body.print-comparison #comparison-report {
+                display: block !important; width: 210mm; height: 297mm; max-width: none;
+                margin: 0 !important; padding: 15mm 20mm; box-shadow: none !important;
+                page-break-after: avoid; page-break-inside: avoid;
+            }
+            
+            body.print-certificates #comparison-controls,
+            body.print-certificates #comparison-report,
+            body.print-certificates .tab-bar { display: none !important; }
+
+            .certificate-page {
+                box-shadow: none; margin: 0; width: 210mm; height: 297mm;
+                max-width: none; padding: 15mm 20mm; page-break-after: always;
+                page-break-inside: avoid;
+            }
+            .certificate-page:last-of-type {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tab-bar no-print" role="tablist">
+        <button type="button" class="tab-button active" id="tab-certificates" onclick="switchTab('certificates')">Promotion Certificates</button>
+        <button type="button" class="tab-button" id="tab-comparison" onclick="switchTab('comparison')">Result Comparison & Backup</button>
+    </div>
+
+    <!-- CERTIFICATE DATA INPUT PANEL -->
+    <div class="no-print" id="certificate-controls">
+        <h3>Promotion Certificates Data Input</h3>
+        <p style="font-size: 12px; color: #666; margin-top:0;">Fill in your details below. Updates automatically across all pages.</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Employee Name:</label>
+                <input type="text" id="input-name" value="MUHAMMAD SHAHID" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Designation / Post:</label>
+                <input type="text" id="input-designation" value="SST (Computer Science)" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>BPS Scale:</label>
+                <input type="text" id="input-bps" value="16" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>CNIC Number:</label>
+                <input type="text" id="input-cnic" value="36302-1234567-1" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Head Title:</label>
+                <select id="input-head-title" onchange="syncData()">
+                    <option value="HEADMASTER" selected>HEADMASTER</option>
+                    <option value="HEADMISTRESS">HEADMISTRESS</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Office Header Title:</label>
+                <select id="input-office-title" onchange="syncData()">
+                    <option value="Office of the Headmaster" selected>Office of the Headmaster</option>
+                    <option value="Office of the Headmistress">Office of the Headmistress</option>
+                </select>
+            </div>
+            <div class="form-group full-width">
+                <label>School Name & Location:</label>
+                <input type="text" id="input-school" value="Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal" oninput="syncData()">
+            </div>
+
+            <!-- GLOBAL BACKUP & RESTORE BUTTONS IN CERTIFICATE PANEL AS WELL -->
+            <div class="form-group full-width" style="margin-top: 10px; border-top: 1px solid #cbd5e1; padding-top: 10px;">
+                <label>Global Data Backup & Restore:</label>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <button type="button" class="backup-btn" style="margin:0; flex:1;" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
+                    <button type="button" class="restore-btn" style="margin:0; flex:1;" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
+                    <input type="file" id="restore-file" style="display: none;" accept=".json" onchange="restoreFromJson(event)">
+                </div>
+            </div>
+
+            <button class="print-btn" onclick="printCertificates()">Print All Certificates (A4)</button>
+        </div>
+    </div>
+
+    <!-- MULTI-YEAR RESULT COMPARISON INPUT PANEL -->
+    <section class="comparison-panel" id="comparison-controls">
+        <h2>Result Comparison Data Entry & Backup</h2>
+        <p style="font-size: 13px; color: #555;">Manage rows and use JSON Backup & Restore to secure or load all your records instantly.</p>
+        
+        <div class="form-grid" style="margin-bottom: 15px;">
+            <div class="form-group full-width">
+                <label>Institution Name for Report:</label>
+                <input id="rep-school-name" type="text" value="Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal" oninput="syncComparisonReport()">
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
+            <button type="button" class="add-year-btn" onclick="addYearRow()">+ Add Year</button>
+            <button type="button" class="backup-btn" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
+            <button type="button" class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
+        </div>
+
+        <table class="comparison-table-input">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Subject / Class</th>
+                    <th>Appeared</th>
+                    <th>Passed</th>
+                    <th>Failed (Auto)</th>
+                    <th>School % (Auto)</th>
+                    <th>Board % (Manual)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="input-table-body">
+                <!-- Rows injected dynamically via JS -->
+            </tbody>
+        </table>
+
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button type="button" class="print-btn" style="margin-top:0;" onclick="printComparison()">Print Report (A4)</button>
+        </div>
+    </section>
+
+    <!-- MULTI-YEAR COMPARISON PRINTABLE REPORT -->
+    <section class="comparison-report" id="comparison-report">
+        <h2>RESULT COMPARISON REPORT</h2>
+        <h3 id="out-report-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</h3>
+        <div class="report-meta">Comparison of Annual Examination Results</div>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Subject / Class</th>
+                    <th>Appeared</th>
+                    <th>Passed</th>
+                    <th>Failed</th>
+                    <th>School Pass %</th>
+                    <th>Board Pass %</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="report-table-body">
+                <!-- Dynamically populated via script -->
+            </tbody>
+        </table>
+
+        <p style="font-size: 13px; margin-top: 20px;">This comparative statement reflects the academic performance and standard of instruction maintained at the institution over consecutive years in comparison with the BISE results.</p>
+
+        <div style="margin-top:40px; display:flex; justify-content:space-between; gap:30px;">
+            <div style="text-align:center; min-width:190px; font-size:13px;">_________________________<br>Prepared By</div>
+            <div style="text-align:center; min-width:190px; font-size:13px;"><span class="sync-head-title">HEADMASTER</span><br><span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span></div>
+        </div>
+
+        <div class="brand-footer">
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+        </div>
+    </section>
+
+    <!-- 1. NO INQUIRY CERTIFICATE -->
+    <div class="certificate-page">
+        <div class="header-box">
+            <h2 class="sync-office-title">Office of the Headmaster</h2>
+            <h3 class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</h3>
+        </div>
+        <div class="cert-title">No Inquiry / No Punishment Certificate</div>
+        <div class="cert-body">
+            <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+            <p style="margin-top: 10px;">
+                It is certified that particulars of <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, Designation: <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>), CNIC No. <span class="sync-cnic">36302-1234567-1</span>, currently working at <strong class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</strong> are as under[cite: 1]:
+            </p>
+            <ol>
+                <li>Certify that no inquiry is pending against <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span> according to this office record[cite: 1].</li>
+                <li>Has no audit paras, draft paras, or financial recovery pending against the employee.</li>
+                <li>Certify that no Punishment was given to <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span> according to this office record[cite: 1].</li>
+                <li>Has no judicial or court case pending against him in any court of law.</li>
+            </ol>
+            <p style="margin-top: 15px;">This certificate is issued for promotion dossier and official record upon his request.</p>
+        </div>
+        <div class="signature-section">
+            <p><span class="sync-head-title">HEADMASTER</span></p>
+            <p><span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span></p>
+        </div>
+        <div class="brand-footer">
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+        </div>
+    </div>
+
+    <!-- 2. NO DEMAND & NO AUDIT PARAS CERTIFICATE -->
+    <div class="certificate-page">
+        <div class="header-box">
+            <h2 class="sync-office-title">Office of the Headmaster</h2>
+            <h3 class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</h3>
+        </div>
+        <div class="cert-title">No Demand & No Audit Paras Certificate</div>
+        <div class="cert-body">
+            <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+            <p style="margin-top: 10px;">
+                It is certified that as per available record of this institution, particulars of <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, Designation: <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>), at <span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span>[cite: 1]:
+            </p>
+            <ol>
+                <li><strong>NO DEMAND CERTIFICATE:</strong> Certify that nothing is outstanding against <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span> according to this office record[cite: 1].</li>
+                <li><strong>NO AUDIT PARAS CERTIFICATE:</strong> Certify that no audit Paras is against <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span> according to this office record[cite: 1].</li>
+            </ol>
+            <p style="margin-top: 15px;">Further, no advance/loan recovery or overpayment is outstanding against the employee’s official account.</p>
+        </div>
+        <div class="signature-section">
+            <p><span class="sync-head-title">HEADMASTER</span></p>
+            <p><span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span></p>
+        </div>
+        <div class="brand-footer">
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+        </div>
+    </div>
+
+    <!-- 3. REGULAR SERVICE CERTIFICATE -->
+    <div class="certificate-page">
+        <div class="header-box">
+            <h2 class="sync-office-title">Office of the Headmaster</h2>
+            <h3 class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</h3>
+        </div>
+        <div class="cert-title">Regular Service & Verification Certificate</div>
+        <div class="cert-body">
+            <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+            <p style="margin-top: 10px;">
+                It is certified that <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong> working at <strong class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</strong>[cite: 1], is a regular employee of the School Education Department, Government of the Punjab. The verified service details are as under:
+            </p>
+            <ul style="list-style-type: none; padding-left: 0; line-height: 1.8;">
+                <li><strong>Designation & Scale:</strong> <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>)</li>
+                <li><strong>CNIC Number:</strong> <span class="sync-cnic">36302-1234567-1</span></li>
+            </ul>
+            <p style="margin-top: 10px;">The employee’s service record is clean, satisfactory, and continuous to date without any interruption or unauthorized absence.</p>
+        </div>
+        <div class="signature-section">
+            <p><span class="sync-head-title">HEADMASTER</span></p>
+            <p><span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span></p>
+        </div>
+        <div class="brand-footer">
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+        </div>
+    </div>
+
+    <!-- 4. NO LPR / NO OPTION CERTIFICATE -->
+    <div class="certificate-page">
+        <div class="header-box">
+            <h2 class="sync-office-title">Office of the Headmaster</h2>
+            <h3 class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</h3>
+        </div>
+        <div class="cert-title">No LPR / No Option Certificate</div>
+        <div class="cert-body">
+            <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+            <p style="margin-top: 10px;">
+                It is certified that <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, Designation: <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>), currently working at <strong class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</strong>[cite: 1]:
+            </p>
+            <ol>
+                <li>The employee has <strong>NOT</strong> applied for Leave Preparatory to Retirement (LPR).</li>
+                <li>The employee has <strong>NOT</strong> opted for Premature or Voluntary Retirement.</li>
+                <li>The employee is actively performing his official duties on a regular basis at this institution.</li>
+                <li>The employee has no intention to proceed on LPR in the near future and will complete his full length of service.</li>
+            </ol>
+            <p style="margin-top: 15px;">This certificate is issued upon his request for the compilation of his promotion dossier.</p>
+        </div>
+        <div class="signature-section">
+            <p><span class="sync-head-title">HEADMASTER</span></p>
+            <p><span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span></p>
+        </div>
+        <div class="brand-footer">
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+        </div>
+    </div>
+
+    <script>
+        // Initial sample data rows with Subject / Class
+        let yearData = [
+            { year: '2024', subject: '10th Computer Science', appeared: 50, passed: 45, board: 85.50 },
+            { year: '2025', subject: '10th Computer Science', appeared: 60, passed: 54, board: 88.00 },
+            { year: '2026', subject: '10th Computer Science', appeared: 65, passed: 61, board: 89.20 }
+        ];
+
+        function renderTable() {
+            let inputHTML = '';
+            yearData.forEach((item, index) => {
+                inputHTML += `
+                    <tr data-index="${index}">
+                        <td><input type="text" class="row-year" value="${item.year}" oninput="updateData(${index}, 'year', this.value)" style="font-weight:bold;"></td>
+                        <td><input type="text" class="row-subject" value="${item.subject}" oninput="updateData(${index}, 'subject', this.value)"></td>
+                        <td><input type="number" class="row-app" value="${item.appeared}" oninput="updateData(${index}, 'appeared', this.value)"></td>
+                        <td><input type="number" class="row-pass" value="${item.passed}" oninput="updateData(${index}, 'passed', this.value)"></td>
+                        <td><span class="row-fail">${Math.max(0, item.appeared - item.passed)}</span></td>
+                        <td><span class="row-srate">${item.appeared > 0 ? ((item.passed / item.appeared) * 100).toFixed(2) + '%' : '0.00%'}</span></td>
+                        <td><input type="number" step="0.01" class="row-board" value="${item.board}" oninput="updateData(${index}, 'board', this.value)"></td>
+                        <td><button type="button" class="del-row-btn" onclick="deleteYearRow(${index})">X</button></td>
+                    </tr>
+                `;
+            });
+            document.getElementById('input-table-body').innerHTML = inputHTML;
+            syncComparisonReport();
+        }
+
+        function addYearRow() {
+            const nextYear = yearData.length > 0 ? String(parseInt(yearData[yearData.length - 1].year) + 1) : '2027';
+            yearData.push({ year: nextYear, subject: '10th Computer Science', appeared: 50, passed: 45, board: 85.00 });
+            renderTable();
+        }
+
+        function deleteYearRow(index) {
+            yearData.splice(index, 1);
+            renderTable();
+        }
+
+        function updateData(index, field, value) {
+            if (field === 'year' || field === 'subject') {
+                yearData[index][field] = value;
+            } else {
+                yearData[index][field] = parseFloat(value) || 0;
+            }
+            
+            const row = document.querySelector(`tr[data-index="${index}"]`);
+            if (row) {
+                const app = Math.max(0, parseInt(row.querySelector('.row-app').value) || 0);
+                const pass = Math.max(0, parseInt(row.querySelector('.row-pass').value) || 0);
+                const fail = Math.max(0, app - pass);
+                const srate = app > 0 ? (pass / app) * 100 : 0;
+
+                row.querySelector('.row-fail').textContent = fail;
+                row.querySelector('.row-srate').textContent = srate.toFixed(2) + '%';
+            }
+            syncComparisonReport();
+        }
+
+        // --- COMPLETE JSON BACKUP & RESTORE FUNCTIONS ---
+        function backupToJson() {
+            const allData = {
+                employeeName: document.getElementById('input-name').value,
+                designation: document.getElementById('input-designation').value,
+                bps: document.getElementById('input-bps').value,
+                cnic: document.getElementById('input-cnic').value,
+                headTitle: document.getElementById('input-head-title').value,
+                officeTitle: document.getElementById('input-office-title').value,
+                schoolLocation: document.getElementById('input-school').value,
+                reportSchoolName: document.getElementById('rep-school-name').value,
+                years: yearData
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "complete_promotion_dossier_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function restoreFromJson(event) {
+            const fileReader = new FileReader();
+            if (event.target.files && event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = function (e) {
+                    try {
+                        const parsedData = JSON.parse(e.target.result);
+                        
+                        // Restore employee info
+                        if (parsedData.employeeName) document.getElementById('input-name').value = parsedData.employeeName;
+                        if (parsedData.designation) document.getElementById('input-designation').value = parsedData.designation;
+                        if (parsedData.bps) document.getElementById('input-bps').value = parsedData.bps;
+                        if (parsedData.cnic) document.getElementById('input-cnic').value = parsedData.cnic;
+                        if (parsedData.headTitle) document.getElementById('input-head-title').value = parsedData.headTitle;
+                        if (parsedData.officeTitle) document.getElementById('input-office-title').value = parsedData.officeTitle;
+                        if (parsedData.schoolLocation) document.getElementById('input-school').value = parsedData.schoolLocation;
+                        if (parsedData.reportSchoolName) document.getElementById('rep-school-name').value = parsedData.reportSchoolName;
+                        
+                        // Restore years table rows
+                        if (parsedData.years && Array.isArray(parsedData.years)) {
+                            yearData = parsedData.years;
+                            renderTable();
+                        }
+                        
+                        syncData();
+                        alert("All data restored successfully!");
+                    } catch (error) {
+                        alert("Invalid JSON file format!");
+                    }
+                };
+            }
+        }
+        // ------------------------------------------------
+
+        function syncData() {
+            const name = document.getElementById('input-name').value;
+            const designation = document.getElementById('input-designation').value;
+            const bps = document.getElementById('input-bps').value;
+            const cnic = document.getElementById('input-cnic').value;
+            const school = document.getElementById('input-school').value;
+            const headTitle = document.getElementById('input-head-title').value;
+            const officeTitle = document.getElementById('input-office-title').value;
+
+            document.querySelectorAll('.sync-name').forEach(el => el.textContent = name);
+            document.querySelectorAll('.sync-designation').forEach(el => el.textContent = designation);
+            document.querySelectorAll('.sync-bps').forEach(el => el.textContent = bps);
+            document.querySelectorAll('.sync-cnic').forEach(el => el.textContent = cnic);
+            document.querySelectorAll('.sync-school').forEach(el => el.textContent = school);
+            document.querySelectorAll('.sync-head-title').forEach(el => el.textContent = headTitle);
+            document.querySelectorAll('.sync-office-title').forEach(el => el.textContent = officeTitle);
+        }
+
+        function switchTab(tab) {
+            const certificates = tab === 'certificates';
+            document.getElementById('certificate-controls').classList.toggle('hidden-view', !certificates);
+            document.querySelectorAll('.certificate-page').forEach(el => el.classList.toggle('hidden-view', !certificates));
+            document.getElementById('comparison-controls').style.display = certificates ? 'none' : 'block';
+            document.getElementById('comparison-report').style.display = certificates ? 'none' : 'block';
+            document.getElementById('tab-certificates').classList.toggle('active', certificates);
+            document.getElementById('tab-comparison').classList.toggle('active', !certificates);
+            document.body.classList.remove('print-certificates', 'print-comparison');
+        }
+
+        function syncComparisonReport() {
+            const schoolName = document.getElementById('rep-school-name').value;
+            document.getElementById('out-report-school').textContent = schoolName;
+
+            let tbodyHTML = '';
+            yearData.forEach((item) => {
+                const appeared = Math.max(0, parseInt(item.appeared) || 0);
+                const passed = Math.max(0, parseInt(item.passed) || 0);
+                const failed = Math.max(0, appeared - passed);
+                const schoolRate = appeared > 0 ? (passed / appeared) * 100 : 0;
+                const boardRate = parseFloat(item.board) || 0;
+                const diff = schoolRate - boardRate;
+
+                let statusText = '';
+                if (diff > 0) {
+                    statusText = `Above Board`;
+                } else if (diff < 0) {
+                    statusText = `Below Board`;
+                } else {
+                    statusText = `Equal to Board`;
+                }
+
+                tbodyHTML += `
+                    <tr>
+                        <td><strong>${item.year || '—'}</strong></td>
+                        <td>${item.subject || '—'}</td>
+                        <td>${appeared}</td>
+                        <td>${passed}</td>
+                        <td>${failed}</td>
+                        <td>${schoolRate.toFixed(2)}%</td>
+                        <td>${boardRate.toFixed(2)}%</td>
+                        <td>${statusText}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('report-table-body').innerHTML = tbodyHTML;
+        }
+
+        function printCertificates() {
+            document.body.classList.remove('print-comparison');
+            document.body.classList.add('print-certificates');
+            window.print();
+        }
+
+        function printComparison() {
+            syncComparisonReport();
+            document.body.classList.remove('print-certificates');
+            document.body.classList.add('print-comparison');
+            window.print();
+        }
+
+        window.addEventListener('afterprint', function () {
+            document.body.classList.remove('print-certificates', 'print-comparison');
+        });
+
+        // Initialize on load
+        syncData();
+        renderTable();
+    </script>
+</body>
+</html>
