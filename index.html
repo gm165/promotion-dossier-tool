@@ -32,6 +32,7 @@
         .form-group input, .form-group select {
             padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;
             font-size: 14px; width: 100%; box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
         }
         .print-btn {
             grid-column: span 2; background-color: #2563eb; color: white;
@@ -40,31 +41,17 @@
         }
         .print-btn:hover { background-color: #1d4ed8; }
 
-        /* Page Layout — use min-height so screen editing never clips */
+        /* Page Layout — min-height so screen editing never clips */
         .certificate-page, .application-page, .comparison-report {
-            background: white;
-            width: 100%;
-            max-width: 210mm;
-            min-height: 270mm;
-            padding: 15mm 20mm;
-            margin: 0 auto 20px auto;
-            box-sizing: border-box;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-            break-after: page;
-            break-inside: avoid;
+            background: white; width: 100%; max-width: 210mm; min-height: 270mm;
+            padding: 15mm 20mm; margin: 0 auto 20px auto;
+            box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative; break-after: page; break-inside: avoid;
         }
-
-        /* Synopsis grows with content; min-height keeps footer near page bottom */
         .synopsis-report {
-            background: white;
-            width: 100%;
-            max-width: 210mm;
-            min-height: 270mm;
-            margin: 0 auto 20px auto;
-            padding: 15mm 15mm 22mm 15mm;
-            box-sizing: border-box;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: white; width: 100%; max-width: 210mm; min-height: 270mm;
+            margin: 0 auto 20px auto; padding: 15mm 15mm 22mm 15mm;
+            box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             position: relative;
         }
 
@@ -79,7 +66,6 @@
             text-align: center; font-size: 15px; font-weight: bold;
             text-decoration: underline; margin: 15px 0; text-transform: uppercase;
         }
-
         .cert-body { font-size: 14px; text-align: justify; margin-bottom: 30px; }
         .cert-body ol { margin-top: 8px; padding-left: 20px; }
         .cert-body li { margin-bottom: 6px; }
@@ -96,10 +82,7 @@
             border-top: 1px solid #cbd5e1; padding-top: 4px;
         }
 
-        .tab-bar {
-            max-width: 1050px; margin: 0 auto 14px; display: flex;
-            flex-wrap: wrap; gap: 8px;
-        }
+        .tab-bar { max-width: 1050px; margin: 0 auto 14px; display: flex; flex-wrap: wrap; gap: 8px; }
         .tab-button {
             border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;
             color: #1e293b; padding: 11px 16px; font-weight: bold; cursor: pointer;
@@ -162,6 +145,20 @@
         }
         .synopsis-table th, .comparison-table th {
             background: #e2e8f0; text-align: center;
+        }
+
+        /* Bio-Data Table in Synopsis Report */
+        .bio-table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;
+        }
+        .bio-table td {
+            border: 1px solid #475569; padding: 5px 8px; vertical-align: middle;
+        }
+        .bio-table td.bio-label {
+            background: #e2e8f0; font-weight: bold; width: 38%; text-align: left;
+        }
+        .bio-table td.bio-value {
+            width: 62%; text-align: left;
         }
 
         .hidden-view { display: none !important; }
@@ -250,17 +247,18 @@
                 <label>Father's Name (Parentage):</label>
                 <input type="text" id="input-father" value="MUHAMMAD IBRAHIM" oninput="syncData()">
             </div>
+            <!-- DATE PICKERS -->
             <div class="form-group">
                 <label>Date of Birth:</label>
-                <input type="text" id="input-dob" value="13-01-1971" oninput="syncData()">
+                <input type="date" id="input-dob" value="1971-01-13" oninput="syncData()">
             </div>
             <div class="form-group">
                 <label>Date of Appointment:</label>
-                <input type="text" id="input-doappt" value="21-06-1989" oninput="syncData()">
+                <input type="date" id="input-doappt" value="1989-06-21" oninput="syncData()">
             </div>
             <div class="form-group">
                 <label>Date of Entry into Present Scale:</label>
-                <input type="text" id="input-dopresent" value="21-06-1989" oninput="syncData()">
+                <input type="date" id="input-dopresent" value="1989-06-21" oninput="syncData()">
             </div>
             <div class="form-group">
                 <label>Designation / Post:</label>
@@ -349,17 +347,17 @@
             </div>
             <div class="form-group">
                 <label>Application Date:</label>
-                <input type="text" id="app-input-date" value="02-11-2026" oninput="syncData()">
+                <input type="date" id="app-input-date" value="2026-11-02" oninput="syncData()">
             </div>
-            <div class="form-group">
+            <div class="form-group full-width">
                 <label>Recipient Title & Officer:</label>
                 <input type="text" id="app-input-recipient" value="The District Education Officer (SE), Sahiwal" oninput="syncData()">
             </div>
             <div class="form-group">
-                <label>Promotion Target Rank (e.g., HM / SS / Senior Headmaster):</label>
+                <label>Promotion Target Rank:</label>
                 <input type="text" id="app-input-target-rank" value="Headmaster (HM) / Subject Specialist (SS)" oninput="syncData()">
             </div>
-            <div class="form-group full-width">
+            <div class="form-group">
                 <label>EMIS Code (Optional):</label>
                 <input type="text" id="app-input-emis" value="EMIS: 39120125" oninput="syncData()">
             </div>
@@ -452,7 +450,7 @@
         </div>
     </section>
 
-    <!-- SYNOPSIS PRINTABLE REPORT -->
+    <!-- SYNOPSIS PRINTABLE REPORT (now with bio-data table) -->
     <section class="synopsis-report" id="synopsis-report" style="display:none;">
         <div style="text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 15px;">
             SYNOPSIS OF CHARACTER ROLL IN RESPECT OF<br>
@@ -460,19 +458,48 @@
             O/O <span class="sync-head-title">HEADMASTER</span> <span class="sync-school-name">GOVT. HIGH SCHOOL 175/9-L</span>, <span class="sync-district">DISTRICT SAHIWAL</span>
         </div>
 
-        <div style="font-size: 13px; margin-bottom: 15px; line-height: 1.6;">
-            1. Name with parentage: &nbsp; <strong><span class="sync-name">MUHAMMAD SHAHID</span> S/O <span class="sync-father">MUHAMMAD IBRAHIM</span></strong><br>
-            2. Date of Birth: &nbsp; <strong><span class="sync-dob">13-01-1971</span></strong><br>
-            3. Date of Appointment: &nbsp; <strong><span class="sync-doappt">21-06-1989</span></strong><br>
-            4. Date of Entry into present scale: &nbsp; <strong><span class="sync-dopresent">21-06-1989</span></strong><br>
-            5. CNIC: &nbsp; <strong><span class="sync-cnic">36302-1234567-1</span></strong><br>
-            6. Qualification: &nbsp; <strong><span class="sync-qualification">M.Sc Computer Science</span></strong>
-        </div>
+        <!-- BIO-DATA TABLE (replaces old text block) -->
+        <table class="bio-table">
+            <tbody>
+                <tr>
+                    <td class="bio-label">Name with Parentage</td>
+                    <td class="bio-value"><strong><span class="sync-name">MUHAMMAD SHAHID</span> S/O <span class="sync-father">MUHAMMAD IBRAHIM</span></strong></td>
+                </tr>
+                <tr>
+                    <td class="bio-label">CNIC</td>
+                    <td class="bio-value"><strong><span class="sync-cnic">36302-1234567-1</span></strong></td>
+                </tr>
+                <tr>
+                    <td class="bio-label">Date of Birth</td>
+                    <td class="bio-value"><strong><span class="sync-dob">13-01-1971</span></strong></td>
+                </tr>
+                <tr>
+                    <td class="bio-label">Qualification</td>
+                    <td class="bio-value"><strong><span class="sync-qualification">M.Sc Computer Science</span></strong></td>
+                </tr>
+                <tr>
+                    <td class="bio-label">Date of Appointment</td>
+                    <td class="bio-value"><strong><span class="sync-doappt">21-06-1989</span></strong></td>
+                </tr>
+                <tr>
+                    <td class="bio-label">Date of Entry into Present Scale</td>
+                    <td class="bio-value"><strong><span class="sync-dopresent">21-06-1989</span></strong></td>
+                </tr>
+                <tr>
+                    <td class="bio-label">Present Post / Designation</td>
+                    <td class="bio-value"><strong><span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>)</strong></td>
+                </tr>
+                <tr>
+                    <td class="bio-label">School / Office</td>
+                    <td class="bio-value"><strong><span class="sync-school-name">Govt. High School 175/9-L</span>, <span class="sync-tehsil">Tehsil Chichawatni</span>, <span class="sync-district">District Sahiwal</span></strong></td>
+                </tr>
+            </tbody>
+        </table>
 
         <table class="synopsis-table">
             <thead>
                 <tr>
-                    <th style="width: 15%;">Year</th>
+                    <th style="width: 15%;">Period</th>
                     <th style="width: 8%;">Post Held</th>
                     <th style="width: 10%;">Integrity</th>
                     <th style="width: 10%;">General Assessment</th>
@@ -493,7 +520,7 @@
 
         <div style="margin-top: 35px; display: flex; justify-content: flex-end;">
             <div style="text-align: center; min-width: 220px; font-size: 13px;">
-                <strong>Signature & Stamp of<br>Reporting Officer</strong>
+                <strong>Signature &amp; Stamp of<br>Reporting Officer</strong>
             </div>
         </div>
 
@@ -637,7 +664,7 @@
                 It is certified that <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong> working at <strong class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></strong>, is a regular employee of the School Education Department, Government of the Punjab. The verified service details are as under:
             </p>
             <ul style="list-style-type: none; padding-left: 0; line-height: 1.8;">
-                <li><strong>Designation & Scale:</strong> <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>)</li>
+                <li><strong>Designation &amp; Scale:</strong> <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>)</li>
                 <li><strong>CNIC Number:</strong> <span class="sync-cnic">36302-1234567-1</span></li>
             </ul>
             <p style="margin-top: 10px;">The employee’s service record is clean, satisfactory, and continuous to date without any interruption or unauthorized absence.</p>
@@ -688,7 +715,6 @@
             { year: '2025', subject: '10th Computer Science', appeared: 60, passed: 54, board: 88.00 }
         ];
 
-        // Single source of truth for head→office mapping (matches <option> values exactly)
         const HEAD_TO_OFFICE = {
             "HEADMASTER": "Office of the Headmaster",
             "HEADMISTRESS": "Office of the Headmistress",
@@ -703,6 +729,15 @@
             "DEO (E/FEMALE)": "Office of the DEO (E/Female)",
             "CEO": "Office of the CEO"
         };
+
+        // ---------- DATE FORMATTING HELPERS ----------
+        // <input type="date"> stores YYYY-MM-DD; we display DD-MM-YYYY on documents.
+        function formatDate(isoDate) {
+            if (!isoDate) return '';
+            const parts = isoDate.split('-');
+            if (parts.length !== 3) return isoDate; // not ISO — return as-is
+            return parts[2] + '-' + parts[1] + '-' + parts[0]; // YYYY-MM-DD → DD-MM-YYYY
+        }
 
         // ---------- SYNOPSIS ----------
         function renderSynopsisTable() {
@@ -835,9 +870,9 @@
             const allData = {
                 employeeName: document.getElementById('input-name').value,
                 fatherName: document.getElementById('input-father').value,
-                dob: document.getElementById('input-dob').value,
-                doappt: document.getElementById('input-doappt').value,
-                dopresent: document.getElementById('input-dopresent').value,
+                dob: document.getElementById('input-dob').value,                // ISO YYYY-MM-DD
+                doappt: document.getElementById('input-doappt').value,          // ISO YYYY-MM-DD
+                dopresent: document.getElementById('input-dopresent').value,    // ISO YYYY-MM-DD
                 designation: document.getElementById('input-designation').value,
                 bps: document.getElementById('input-bps').value,
                 cnic: document.getElementById('input-cnic').value,
@@ -848,7 +883,7 @@
                 tehsil: document.getElementById('input-tehsil').value,
                 district: document.getElementById('input-district').value,
                 appNo: document.getElementById('app-input-no').value,
-                appDate: document.getElementById('app-input-date').value,
+                appDate: document.getElementById('app-input-date').value,      // ISO YYYY-MM-DD
                 appRecipient: document.getElementById('app-input-recipient').value,
                 appTargetRank: document.getElementById('app-input-target-rank').value,
                 appEmis: document.getElementById('app-input-emis').value,
@@ -875,9 +910,10 @@
 
                         if (parsedData.employeeName) document.getElementById('input-name').value = parsedData.employeeName;
                         if (parsedData.fatherName) document.getElementById('input-father').value = parsedData.fatherName;
-                        if (parsedData.dob) document.getElementById('input-dob').value = parsedData.dob;
-                        if (parsedData.doappt) document.getElementById('input-doappt').value = parsedData.doappt;
-                        if (parsedData.dopresent) document.getElementById('input-dopresent').value = parsedData.dopresent;
+                        // Dates: accept either YYYY-MM-DD (new format) or DD-MM-YYYY (old backups)
+                        if (parsedData.dob) document.getElementById('input-dob').value = toIsoDate(parsedData.dob);
+                        if (parsedData.doappt) document.getElementById('input-doappt').value = toIsoDate(parsedData.doappt);
+                        if (parsedData.dopresent) document.getElementById('input-dopresent').value = toIsoDate(parsedData.dopresent);
                         if (parsedData.designation) document.getElementById('input-designation').value = parsedData.designation;
                         if (parsedData.bps) document.getElementById('input-bps').value = parsedData.bps;
                         if (parsedData.cnic) document.getElementById('input-cnic').value = parsedData.cnic;
@@ -886,22 +922,16 @@
                         if (parsedData.tehsil) document.getElementById('input-tehsil').value = parsedData.tehsil;
                         if (parsedData.district) document.getElementById('input-district').value = parsedData.district;
                         if (parsedData.appNo) document.getElementById('app-input-no').value = parsedData.appNo;
-                        if (parsedData.appDate) document.getElementById('app-input-date').value = parsedData.appDate;
+                        if (parsedData.appDate) document.getElementById('app-input-date').value = toIsoDate(parsedData.appDate);
                         if (parsedData.appRecipient) document.getElementById('app-input-recipient').value = parsedData.appRecipient;
                         if (parsedData.appTargetRank) document.getElementById('app-input-target-rank').value = parsedData.appTargetRank;
                         if (parsedData.appEmis) document.getElementById('app-input-emis').value = parsedData.appEmis;
 
-                        // Head title first
-                        if (parsedData.headTitle) {
-                            document.getElementById('input-head-title').value = parsedData.headTitle;
-                        }
-                        // Office title — try explicit, fallback derive if mismatched
+                        if (parsedData.headTitle) document.getElementById('input-head-title').value = parsedData.headTitle;
                         if (parsedData.officeTitle) {
                             const sel = document.getElementById('input-office-title');
                             sel.value = parsedData.officeTitle;
-                            if (sel.value !== parsedData.officeTitle) {
-                                onHeadTitleChange();
-                            }
+                            if (sel.value !== parsedData.officeTitle) onHeadTitleChange();
                         } else if (parsedData.headTitle) {
                             onHeadTitleChange();
                         }
@@ -920,19 +950,29 @@
                     } catch (error) {
                         alert("Invalid JSON file format!");
                     } finally {
-                        event.target.value = "";  // allow re-selecting the same file
+                        event.target.value = "";
                     }
                 };
             }
+        }
+
+        // Convert DD-MM-YYYY (old format) to YYYY-MM-DD (ISO, for date input)
+        function toIsoDate(dateStr) {
+            if (!dateStr) return '';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr; // already ISO
+            const m = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+            if (m) return m[3] + '-' + m[2] + '-' + m[1];
+            return ''; // unknown format → clear the date input
         }
 
         // ---------- GLOBAL SYNC ----------
         function syncData() {
             const name = document.getElementById('input-name').value;
             const father = document.getElementById('input-father').value;
-            const dob = document.getElementById('input-dob').value;
-            const doappt = document.getElementById('input-doappt').value;
-            const dopresent = document.getElementById('input-dopresent').value;
+            // Read ISO dates from input, but DISPLAY as DD-MM-YYYY on documents
+            const dob = formatDate(document.getElementById('input-dob').value);
+            const doappt = formatDate(document.getElementById('input-doappt').value);
+            const dopresent = formatDate(document.getElementById('input-dopresent').value);
             const designation = document.getElementById('input-designation').value;
             const bps = document.getElementById('input-bps').value;
             const cnic = document.getElementById('input-cnic').value;
@@ -944,7 +984,7 @@
             const officeTitle = document.getElementById('input-office-title').value;
 
             const appNo = document.getElementById('app-input-no').value;
-            const appDate = document.getElementById('app-input-date').value;
+            const appDate = formatDate(document.getElementById('app-input-date').value);
             const appRecipient = document.getElementById('app-input-recipient').value;
             const appTargetRank = document.getElementById('app-input-target-rank').value;
             const appEmis = document.getElementById('app-input-emis').value;
@@ -958,9 +998,9 @@
 
             document.querySelectorAll('.sync-name').forEach(el => el.textContent = name);
             document.querySelectorAll('.sync-father').forEach(el => el.textContent = father);
-            document.querySelectorAll('.sync-dob').forEach(el => el.textContent = dob);
-            document.querySelectorAll('.sync-doappt').forEach(el => el.textContent = doappt);
-            document.querySelectorAll('.sync-dopresent').forEach(el => el.textContent = dopresent);
+            document.querySelectorAll('.sync-dob').forEach(el => el.textContent = dob || '—');
+            document.querySelectorAll('.sync-doappt').forEach(el => el.textContent = doappt || '—');
+            document.querySelectorAll('.sync-dopresent').forEach(el => el.textContent = dopresent || '—');
             document.querySelectorAll('.sync-designation').forEach(el => el.textContent = designation);
             document.querySelectorAll('.sync-bps').forEach(el => el.textContent = bps);
             document.querySelectorAll('.sync-cnic').forEach(el => el.textContent = cnic);
