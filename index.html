@@ -40,12 +40,11 @@
         }
         .print-btn:hover { background-color: #1d4ed8; }
 
-        /* Certificate Page Layout */
         .certificate-page {
             background: white;
             width: 100%;
             max-width: 210mm;
-            min-height: 270mm;              /* FIX: min-height so content isn't clipped on screen */
+            min-height: 270mm;
             padding: 15mm 20mm;
             margin: 0 auto 20px auto;
             box-sizing: border-box;
@@ -83,7 +82,6 @@
             border-top: 1px solid #cbd5e1; padding-top: 4px;
         }
 
-        /* Tabs and Comparison Panel Styling */
         .tab-bar {
             max-width: 950px; margin: 0 auto 14px; display: flex;
             flex-wrap: wrap; gap: 8px;
@@ -149,7 +147,6 @@
 
         .hidden-view { display: none !important; }
 
-        /* Print Adjustments */
         @media print {
             @page { size: A4 portrait; margin: 0; }
             body { background: none; padding: 0; margin: 0; }
@@ -176,7 +173,7 @@
                 page-break-after: always;
                 page-break-inside: avoid;
             }
-            .certificate-page:last-of-type { page-break-after: auto; }   /* FIX: auto not avoid */
+            .certificate-page:last-of-type { page-break-after: auto; }
         }
     </style>
 </head>
@@ -187,7 +184,6 @@
         <button type="button" class="tab-button" id="tab-comparison" onclick="switchTab('comparison')">Result Comparison & Backup</button>
     </div>
 
-    <!-- CERTIFICATE DATA INPUT PANEL -->
     <div class="no-print" id="certificate-controls">
         <h3>Promotion Certificates Data Input</h3>
         <p style="font-size: 12px; color: #666; margin-top:0;">Fill in your details below. Updates automatically across all pages.</p>
@@ -233,13 +229,14 @@
                     <option value="Office of the Principal">Office of the Principal</option>
                     <option value="Office of the Senior Headmaster">Office of the Senior Headmaster</option>
                     <option value="Office of the Senior Headmistress">Office of the Senior Headmistress</option>
-                    <option value="Office of the AEO">Office of the Assistant Education Officer</option>
-                    <option value="Office of the Deputy DEO (Male)">Office of the Deputy DEO (Male)</option>
-                    <option value="Office of the Deputy DEO (Female)">Office of the Deputy DEO (Female)</option>
+                    <!-- FIX: options below now match JS map exactly -->
+                    <option value="Office of the Assistant Education Officer">Office of the Assistant Education Officer (AEO)</option>
+                    <option value="Office of the Deputy District Education Officer (Male)">Office of the Deputy District Education Officer (Male)</option>
+                    <option value="Office of the Deputy District Education Officer (Female)">Office of the Deputy District Education Officer (Female)</option>
                     <option value="Office of the DEO (SE)">Office of the DEO (SE)</option>
-                    <option value="Office of the DEO (E/Male)">Office of the DEO (E/Male)</option>
-                    <option value="Office of the DEO (E/Female)">Office of the DEO (E/Female)</option>
-                    <option value="Office of the CEO">Office of the CEO</option>
+                    <option value="Office of the District Education Officer (E/Male)">Office of the District Education Officer (E/Male)</option>
+                    <option value="Office of the District Education Officer (E/Female)">Office of the District Education Officer (E/Female)</option>
+                    <option value="Office of the Chief Executive Officer">Office of the Chief Executive Officer (CEO)</option>
                 </select>
             </div>
             <div class="form-group full-width">
@@ -268,7 +265,6 @@
         </div>
     </div>
 
-    <!-- MULTI-YEAR RESULT COMPARISON INPUT PANEL -->
     <section class="comparison-panel" id="comparison-controls">
         <h2>Result Comparison Data Entry & Backup</h2>
         <p style="font-size: 13px; color: #555;">Manage rows and use JSON Backup & Restore to secure or load all your records instantly.</p>
@@ -294,7 +290,6 @@
         </div>
     </section>
 
-    <!-- MULTI-YEAR COMPARISON PRINTABLE REPORT -->
     <section class="comparison-report" id="comparison-report">
         <h2>RESULT COMPARISON REPORT</h2>
         <h3 id="out-report-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
@@ -433,6 +428,22 @@
             { year: '2026', subject: '10th Computer Science', appeared: 65, passed: 61, board: 89.20 }
         ];
 
+        // Single source of truth for the head→office mapping
+        const HEAD_TO_OFFICE = {
+            "HEADMASTER": "Office of the Headmaster",
+            "HEADMISTRESS": "Office of the Headmistress",
+            "PRINCIPAL": "Office of the Principal",
+            "SENIOR HEADMASTER": "Office of the Senior Headmaster",
+            "SENIOR HEADMISTRESS": "Office of the Senior Headmistress",
+            "AEO": "Office of the Assistant Education Officer",
+            "DEPUTY DEO (MALE)": "Office of the Deputy District Education Officer (Male)",
+            "DEPUTY DEO (FEMALE)": "Office of the Deputy District Education Officer (Female)",
+            "DEO (SE)": "Office of the DEO (SE)",
+            "DEO (E/MALE)": "Office of the District Education Officer (E/Male)",
+            "DEO (E/FEMALE)": "Office of the District Education Officer (E/Female)",
+            "CEO": "Office of the Chief Executive Officer"
+        };
+
         function renderTable() {
             let inputHTML = '';
             yearData.forEach((item, index) => {
@@ -491,33 +502,17 @@
             syncComparisonReport();
         }
 
-        // FIXED: AEO mapping
+        // FIXED: uses shared mapping, HTML options now match exactly
         function onHeadTitleChange() {
             const headTitleVal = document.getElementById('input-head-title').value;
             const officeTitleSelect = document.getElementById('input-office-title');
 
-            const map = {
-                "HEADMASTER": "Office of the Headmaster",
-                "HEADMISTRESS": "Office of the Headmistress",
-                "PRINCIPAL": "Office of the Principal",
-                "SENIOR HEADMASTER": "Office of the Senior Headmaster",
-                "SENIOR HEADMISTRESS": "Office of the Senior Headmistress",
-                "AEO": "Office of the Assistant Education Officer",                                  // FIXED
-                "DEPUTY DEO (MALE)": "Office of the Deputy District Education Officer (Male)",
-                "DEPUTY DEO (FEMALE)": "Office of the Deputy District Education Officer (Female)",
-                "DEO (SE)": "Office of the DEO (SE)",
-                "DEO (E/MALE)": "Office of the District Education Officer (E/Male)",
-                "DEO (E/FEMALE)": "Office of the District Education Officer (E/Female)",
-                "CEO": "Office of the Chief Exective Officer"
-            };
-
-            const target = map[headTitleVal];
+            const target = HEAD_TO_OFFICE[headTitleVal];
             if (target) {
-                for (let i = 0; i < officeTitleSelect.options.length; i++) {
-                    if (officeTitleSelect.options[i].value === target) {
-                        officeTitleSelect.selectedIndex = i;
-                        break;
-                    }
+                officeTitleSelect.value = target;   // direct assignment, works if option exists
+                if (officeTitleSelect.value !== target) {
+                    // No matching option — log for debugging
+                    console.warn("No <option> found for office title:", target);
                 }
             }
             syncData();
@@ -562,12 +557,22 @@
                         if (parsedData.tehsil) document.getElementById('input-tehsil').value = parsedData.tehsil;
                         if (parsedData.district) document.getElementById('input-district').value = parsedData.district;
 
-                        // Set head title first, then office title (explicit) — so no mismatch
-                        if (parsedData.headTitle) document.getElementById('input-head-title').value = parsedData.headTitle;
+                        // Head title first
+                        if (parsedData.headTitle) {
+                            document.getElementById('input-head-title').value = parsedData.headTitle;
+                        }
+
+                        // Try to restore office title; if the saved value doesn't exist as an option,
+                        // fall back to derived value from head title.
                         if (parsedData.officeTitle) {
-                            document.getElementById('input-office-title').value = parsedData.officeTitle;
+                            const sel = document.getElementById('input-office-title');
+                            sel.value = parsedData.officeTitle;
+                            if (sel.value !== parsedData.officeTitle) {
+                                // Option not present — derive from head title instead
+                                onHeadTitleChange();
+                            }
                         } else if (parsedData.headTitle) {
-                            onHeadTitleChange();   // auto-derive if office missing
+                            onHeadTitleChange();
                         }
 
                         if (parsedData.years && Array.isArray(parsedData.years)) {
@@ -580,7 +585,7 @@
                     } catch (error) {
                         alert("Invalid JSON file format!");
                     } finally {
-                        event.target.value = "";  // FIX: allow re-selecting same file
+                        event.target.value = "";
                     }
                 };
             }
@@ -631,7 +636,7 @@
 
                 let statusText = '';
                 if (appeared === 0 && boardRate === 0) {
-                    statusText = 'No Data';                 // FIX: avoid misleading "Equal"
+                    statusText = 'No Data';
                 } else if (diff > 0.005) {
                     statusText = 'Above Board';
                 } else if (diff < -0.005) {
