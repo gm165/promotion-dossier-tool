@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Promotion Certificates & Result Comparison</title>
+    <title>Employee Promotion Dossier Management System</title>
     <style>
         body {
             font-family: 'Times New Roman', Times, serif;
@@ -19,7 +19,7 @@
             margin-bottom: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 950px;
+            max-width: 1050px;
             margin-left: auto;
             margin-right: auto;
             box-sizing: border-box;
@@ -40,7 +40,8 @@
         }
         .print-btn:hover { background-color: #1d4ed8; }
 
-        .certificate-page {
+        /* Page Layout — use min-height so screen editing never clips */
+        .certificate-page, .application-page, .comparison-report {
             background: white;
             width: 100%;
             max-width: 210mm;
@@ -52,6 +53,19 @@
             position: relative;
             break-after: page;
             break-inside: avoid;
+        }
+
+        /* Synopsis grows with content; min-height keeps footer near page bottom */
+        .synopsis-report {
+            background: white;
+            width: 100%;
+            max-width: 210mm;
+            min-height: 270mm;
+            margin: 0 auto 20px auto;
+            padding: 15mm 15mm 22mm 15mm;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .header-box {
@@ -72,7 +86,7 @@
 
         .signature-section {
             position: absolute; bottom: 22mm; right: 20mm;
-            text-align: left; width: 240px;
+            text-align: left; width: 260px;
         }
         .signature-section p { margin: 2px 0; font-size: 13px; font-weight: bold; }
 
@@ -83,7 +97,7 @@
         }
 
         .tab-bar {
-            max-width: 950px; margin: 0 auto 14px; display: flex;
+            max-width: 1050px; margin: 0 auto 14px; display: flex;
             flex-wrap: wrap; gap: 8px;
         }
         .tab-button {
@@ -92,30 +106,35 @@
         }
         .tab-button.active { color: #fff; background: #1d4ed8; border-color: #1d4ed8; }
 
-        .comparison-panel {
-            display: none; max-width: 950px; margin: 0 auto 20px; background: #fff;
+        .panel-section {
+            display: none; max-width: 1050px; margin: 0 auto 20px; background: #fff;
             padding: 18px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.1);
             box-sizing: border-box;
         }
-        .comparison-panel h2, .comparison-report h2, .comparison-report h3 {
-            color: #1e3a5f; margin-top: 0;
+        .panel-section h2 { color: #1e3a5f; margin-top: 0; }
+
+        .table-scroll { overflow-x: auto; }
+
+        .comparison-table-input, .synopsis-input-table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px;
         }
-        .comparison-table-input {
-            width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;
+        .comparison-table-input th, .comparison-table-input td,
+        .synopsis-input-table th, .synopsis-input-table td {
+            border: 1px solid #cbd5e1; padding: 6px; text-align: center; vertical-align: middle;
         }
-        .comparison-table-input th, .comparison-table-input td {
-            border: 1px solid #cbd5e1; padding: 8px; text-align: center;
+        .comparison-table-input th, .synopsis-input-table th { background: #f8fafc; }
+        .comparison-table-input input, .synopsis-input-table input, .synopsis-input-table textarea {
+            width: 100%; padding: 5px; box-sizing: border-box;
+            border: 1px solid #cbd5e1; border-radius: 4px;
+            font-family: 'Times New Roman', Times, serif; font-size: 12px;
         }
-        .comparison-table-input th { background: #f8fafc; }
-        .comparison-table-input input {
-            width: 100%; padding: 6px; box-sizing: border-box;
-            border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;
-        }
-        .add-year-btn {
+        .synopsis-input-table textarea { resize: vertical; height: 45px; }
+
+        .add-row-btn {
             background-color: #16a34a; color: white; border: none; padding: 8px 14px;
             border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 10px;
         }
-        .add-year-btn:hover { background-color: #15803d; }
+        .add-row-btn:hover { background-color: #15803d; }
         .backup-btn {
             background-color: #0284c7; color: white; border: none; padding: 8px 14px;
             border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;
@@ -134,16 +153,16 @@
         }
         .del-row-btn:hover { background-color: #b91c1c; }
 
-        .comparison-report {
-            display: none; max-width: 210mm; margin: 0 auto 20px; background: #fff;
-            padding: 15mm 20mm; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,.1);
-            position: relative; min-height: 270mm;
+        .synopsis-table, .comparison-table {
+            width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px;
         }
-        .comparison-report h2, .comparison-report h3 { text-align: center; margin: 5px 0; }
-        .comparison-report .report-meta { text-align: center; margin: 8px 0 18px; font-size: 14px; }
-        .comparison-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
-        .comparison-table th, .comparison-table td { border: 1px solid #64748b; padding: 8px; text-align: center; }
-        .comparison-table th { background: #e2e8f0; }
+        .synopsis-table th, .synopsis-table td,
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #475569; padding: 6px; text-align: left; vertical-align: top;
+        }
+        .synopsis-table th, .comparison-table th {
+            background: #e2e8f0; text-align: center;
+        }
 
         .hidden-view { display: none !important; }
 
@@ -152,10 +171,47 @@
             body { background: none; padding: 0; margin: 0; }
             .no-print { display: none !important; }
 
+            body.print-certificates .panel-section,
+            body.print-certificates #application-report,
+            body.print-certificates #synopsis-report,
+            body.print-certificates #comparison-report,
+            body.print-certificates .tab-bar { display: none !important; }
+
+            body.print-application .certificate-page,
+            body.print-application #certificate-controls,
+            body.print-application #synopsis-controls,
+            body.print-application #synopsis-report,
+            body.print-application #comparison-controls,
+            body.print-application #comparison-report,
+            body.print-application .tab-bar { display: none !important; }
+
+            body.print-application #application-report {
+                display: block !important; width: 210mm; min-height: 297mm; max-width: none;
+                margin: 0 !important; padding: 15mm 20mm; box-shadow: none !important;
+                page-break-after: avoid; page-break-inside: avoid;
+            }
+
+            body.print-synopsis .certificate-page,
+            body.print-synopsis #certificate-controls,
+            body.print-synopsis #application-controls,
+            body.print-synopsis #application-report,
+            body.print-synopsis #comparison-controls,
+            body.print-synopsis #comparison-report,
+            body.print-synopsis .tab-bar { display: none !important; }
+
+            body.print-synopsis #synopsis-report {
+                display: block !important; width: 210mm !important; min-height: 297mm; max-width: none;
+                margin: 0 !important; padding: 15mm 20mm 22mm 20mm !important;
+                box-shadow: none !important;
+            }
+
             body.print-comparison .certificate-page,
             body.print-comparison #certificate-controls,
-            body.print-comparison .tab-bar,
-            body.print-comparison #comparison-controls { display: none !important; }
+            body.print-comparison #application-controls,
+            body.print-comparison #application-report,
+            body.print-comparison #synopsis-controls,
+            body.print-comparison #synopsis-report,
+            body.print-comparison .tab-bar { display: none !important; }
 
             body.print-comparison #comparison-report {
                 display: block !important; width: 210mm; min-height: 297mm; max-width: none;
@@ -163,14 +219,9 @@
                 page-break-after: avoid; page-break-inside: avoid;
             }
 
-            body.print-certificates #comparison-controls,
-            body.print-certificates #comparison-report,
-            body.print-certificates .tab-bar { display: none !important; }
-
             .certificate-page {
                 box-shadow: none; margin: 0; width: 210mm; min-height: 297mm;
-                max-width: none; padding: 15mm 20mm;
-                page-break-after: always;
+                max-width: none; padding: 15mm 20mm; page-break-after: always;
                 page-break-inside: avoid;
             }
             .certificate-page:last-of-type { page-break-after: auto; }
@@ -181,16 +232,35 @@
 
     <div class="tab-bar no-print" role="tablist">
         <button type="button" class="tab-button active" id="tab-certificates" onclick="switchTab('certificates')">Promotion Certificates</button>
+        <button type="button" class="tab-button" id="tab-application" onclick="switchTab('application')">Application Form</button>
+        <button type="button" class="tab-button" id="tab-synopsis" onclick="switchTab('synopsis')">Synopsis Report</button>
         <button type="button" class="tab-button" id="tab-comparison" onclick="switchTab('comparison')">Result Comparison & Backup</button>
     </div>
 
+    <!-- GLOBAL & CERTIFICATE DATA INPUT PANEL -->
     <div class="no-print" id="certificate-controls">
-        <h3>Promotion Certificates Data Input</h3>
-        <p style="font-size: 12px; color: #666; margin-top:0;">Fill in your details below. Updates automatically across all pages.</p>
+        <h3>Promotion Dossier Global Data Input</h3>
+        <p style="font-size: 12px; color: #666; margin-top:0;">Fill in your details below. Updates automatically across all certificates, application form, and reports.</p>
         <div class="form-grid">
             <div class="form-group">
                 <label>Employee Name:</label>
                 <input type="text" id="input-name" value="MUHAMMAD SHAHID" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Father's Name (Parentage):</label>
+                <input type="text" id="input-father" value="MUHAMMAD IBRAHIM" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Date of Birth:</label>
+                <input type="text" id="input-dob" value="13-01-1971" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Date of Appointment:</label>
+                <input type="text" id="input-doappt" value="21-06-1989" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Date of Entry into Present Scale:</label>
+                <input type="text" id="input-dopresent" value="21-06-1989" oninput="syncData()">
             </div>
             <div class="form-group">
                 <label>Designation / Post:</label>
@@ -203,6 +273,10 @@
             <div class="form-group">
                 <label>CNIC Number:</label>
                 <input type="text" id="input-cnic" value="36302-1234567-1" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Qualification:</label>
+                <input type="text" id="input-qualification" value="M.Sc Computer Science" oninput="syncData()">
             </div>
             <div class="form-group">
                 <label>Head Title (Signatory Designation):</label>
@@ -229,14 +303,13 @@
                     <option value="Office of the Principal">Office of the Principal</option>
                     <option value="Office of the Senior Headmaster">Office of the Senior Headmaster</option>
                     <option value="Office of the Senior Headmistress">Office of the Senior Headmistress</option>
-                    <!-- FIX: options below now match JS map exactly -->
-                    <option value="Office of the Assistant Education Officer">Office of the Assistant Education Officer (AEO)</option>
-                    <option value="Office of the Deputy District Education Officer (Male)">Office of the Deputy District Education Officer (Male)</option>
-                    <option value="Office of the Deputy District Education Officer (Female)">Office of the Deputy District Education Officer (Female)</option>
+                    <option value="Office of the AEO">Office of the AEO</option>
+                    <option value="Office of the Deputy DEO (Male)">Office of the Deputy DEO (Male)</option>
+                    <option value="Office of the Deputy DEO (Female)">Office of the Deputy DEO (Female)</option>
                     <option value="Office of the DEO (SE)">Office of the DEO (SE)</option>
-                    <option value="Office of the District Education Officer (E/Male)">Office of the District Education Officer (E/Male)</option>
-                    <option value="Office of the District Education Officer (E/Female)">Office of the District Education Officer (E/Female)</option>
-                    <option value="Office of the Chief Executive Officer">Office of the Chief Executive Officer (CEO)</option>
+                    <option value="Office of the DEO (E/Male)">Office of the DEO (E/Male)</option>
+                    <option value="Office of the DEO (E/Female)">Office of the DEO (E/Female)</option>
+                    <option value="Office of the CEO">Office of the CEO</option>
                 </select>
             </div>
             <div class="form-group full-width">
@@ -265,12 +338,181 @@
         </div>
     </div>
 
-    <section class="comparison-panel" id="comparison-controls">
+    <!-- APPLICATION CONTROL PANEL -->
+    <section class="panel-section no-print" id="application-controls">
+        <h2>Cover Application Data Entry</h2>
+        <p style="font-size: 13px; color: #555;">Customize application reference details and target promotion rank for dossier submission.</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Dispatch / Outward No:</label>
+                <input type="text" id="app-input-no" value="GHS/175-9L/2026/102" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Application Date:</label>
+                <input type="text" id="app-input-date" value="02-11-2026" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Recipient Title & Officer:</label>
+                <input type="text" id="app-input-recipient" value="The District Education Officer (SE), Sahiwal" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Promotion Target Rank (e.g., HM / SS / Senior Headmaster):</label>
+                <input type="text" id="app-input-target-rank" value="Headmaster (HM) / Subject Specialist (SS)" oninput="syncData()">
+            </div>
+            <div class="form-group full-width">
+                <label>EMIS Code (Optional):</label>
+                <input type="text" id="app-input-emis" value="EMIS: 39120125" oninput="syncData()">
+            </div>
+        </div>
+        <div style="margin-top: 15px;">
+            <button type="button" class="print-btn" style="margin-top:0;" onclick="printApplication()">Print Application (A4)</button>
+        </div>
+    </section>
+
+    <!-- PRINTABLE COVER APPLICATION PAGE -->
+    <section class="application-page" id="application-report" style="display:none;">
+        <div class="header-box">
+            <h2 class="sync-office-title">Office of the Headmaster</h2>
+            <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
+            <div style="font-size: 12px; font-weight: bold; margin-top: 3px;" id="out-app-emis">EMIS: 39120125</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; margin-bottom: 20px;">
+            <div>NO. <span id="out-app-no">GHS/175-9L/2026/102</span></div>
+            <div>DATED: <span id="out-app-date">02-11-2026</span></div>
+        </div>
+
+        <div style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+            To,<br>
+            <strong id="out-app-recipient">The District Education Officer (SE), Sahiwal</strong>
+        </div>
+
+        <div style="font-weight: bold; font-size: 14px; text-decoration: underline; margin: 15px 0;">
+            SUBJECT: <span style="text-transform: uppercase;">APPLICATION FOR SUBMISSION OF COMPLETE RECORD (CR) / DOSSIER FOR PROMOTION FROM <span class="sync-designation">SST (Computer Science)</span> TO <span id="out-app-target-rank">Headmaster (HM) / Subject Specialist (SS)</span></span>
+        </div>
+
+        <div style="font-size: 14px; text-align: justify; line-height: 1.8; margin-top: 15px;">
+            <p><strong>Respected Sir,</strong></p>
+            <p style="text-indent: 30px;">
+                Most respectfully, it is submitted that I, <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, working as <strong><span class="sync-designation">SST (Computer Science)</span></strong> at <strong><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-district">District Sahiwal</span></strong>. I am submitting my complete record (CR) / dossier for consideration of promotion to the rank of <strong><span id="out-app-target-rank-body">Headmaster (HM) / Subject Specialist (SS)</span></strong>.
+            </p>
+            <p style="text-indent: 30px;">
+                All the required documents, performance reports, ACR synopses, and certificates as prescribed in the departmental promotion checklist have been meticulously compiled and attached herewith for official verification and proceedings.
+            </p>
+            <p style="text-indent: 30px;">
+                It is requested that my dossier may kindly be accepted and forwarded to the concerned Departmental Promotion Committee (DPC) for further necessary proceedings.
+            </p>
+            <p style="margin-top: 20px;">Thanking you in anticipation.</p>
+        </div>
+
+        <div class="signature-section" style="bottom: 30mm;">
+            <p style="margin-top: 40px;">_________________________</p>
+            <p><strong><span class="sync-name">MUHAMMAD SHAHID</span></strong></p>
+            <p><span class="sync-designation">SST (Computer Science)</span></p>
+            <p>CNIC: <span class="sync-cnic">36302-1234567-1</span></p>
+            <p><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-district">District Sahiwal</span></p>
+        </div>
+
+        <div class="brand-footer">
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+        </div>
+    </section>
+
+    <!-- SYNOPSIS INPUT PANEL -->
+    <section class="panel-section no-print" id="synopsis-controls">
+        <h2>Synopsis Character Roll Data Entry & Backup</h2>
+        <p style="font-size: 13px; color: #555;">Add, remove, or edit ACR service period rows below just like the comparison table. Changes reflect instantly on the printable synopsis report.</p>
+
+        <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
+            <button type="button" class="add-row-btn" onclick="addSynopsisRow()">+ Add Service Period Row</button>
+            <button type="button" class="backup-btn" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
+            <button type="button" class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
+        </div>
+
+        <div class="table-scroll">
+            <table class="synopsis-input-table">
+                <thead>
+                    <tr>
+                        <th>Period (From - To)</th>
+                        <th>Post Held</th>
+                        <th>Integrity</th>
+                        <th>General Assessment</th>
+                        <th>General Remarks</th>
+                        <th>Adverse Remarks</th>
+                        <th>Fit For Promotion</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="synopsis-input-tbody"></tbody>
+            </table>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button type="button" class="print-btn" style="margin-top:0;" onclick="printSynopsis()">Print Synopsis Report (A4)</button>
+        </div>
+    </section>
+
+    <!-- SYNOPSIS PRINTABLE REPORT -->
+    <section class="synopsis-report" id="synopsis-report" style="display:none;">
+        <div style="text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 15px;">
+            SYNOPSIS OF CHARACTER ROLL IN RESPECT OF<br>
+            MR. <span class="sync-name">MUHAMMAD SHAHID</span> (<span class="sync-designation">SST CS</span>)<br>
+            O/O <span class="sync-head-title">HEADMASTER</span> <span class="sync-school-name">GOVT. HIGH SCHOOL 175/9-L</span>, <span class="sync-district">DISTRICT SAHIWAL</span>
+        </div>
+
+        <div style="font-size: 13px; margin-bottom: 15px; line-height: 1.6;">
+            1. Name with parentage: &nbsp; <strong><span class="sync-name">MUHAMMAD SHAHID</span> S/O <span class="sync-father">MUHAMMAD IBRAHIM</span></strong><br>
+            2. Date of Birth: &nbsp; <strong><span class="sync-dob">13-01-1971</span></strong><br>
+            3. Date of Appointment: &nbsp; <strong><span class="sync-doappt">21-06-1989</span></strong><br>
+            4. Date of Entry into present scale: &nbsp; <strong><span class="sync-dopresent">21-06-1989</span></strong><br>
+            5. CNIC: &nbsp; <strong><span class="sync-cnic">36302-1234567-1</span></strong><br>
+            6. Qualification: &nbsp; <strong><span class="sync-qualification">M.Sc Computer Science</span></strong>
+        </div>
+
+        <table class="synopsis-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Year</th>
+                    <th style="width: 8%;">Post Held</th>
+                    <th style="width: 10%;">Integrity</th>
+                    <th style="width: 10%;">General Assessment</th>
+                    <th style="width: 32%;">General Remarks</th>
+                    <th style="width: 10%;">Adverse Remarks</th>
+                    <th style="width: 15%;">Fit For Promotion</th>
+                </tr>
+            </thead>
+            <tbody id="synopsis-report-tbody"></tbody>
+        </table>
+
+        <div style="font-size: 12px; margin-top: 15px; line-height: 1.6;">
+            1. Certified that there are no adverse remarks in the enclosed synopsis of ACR(s).<br>
+            2. Certified that the above said official was neither previously retired nor reinstated in service.<br>
+            3. Certified that the synopsis of the ACR(s) of the official is in accordance with the character roll and is correct.<br>
+            4. Certified that neither any Enquiry/ Disciplinary case pending against him, nor he was inflicted any punishment.
+        </div>
+
+        <div style="margin-top: 35px; display: flex; justify-content: flex-end;">
+            <div style="text-align: center; min-width: 220px; font-size: 13px;">
+                <strong>Signature & Stamp of<br>Reporting Officer</strong>
+            </div>
+        </div>
+
+        <div style="margin-top: 25px; font-size: 13px; font-weight: bold;">
+            Countersignature of District Education Officer (SE)
+        </div>
+
+        <div class="brand-footer">
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+        </div>
+    </section>
+
+    <!-- MULTI-YEAR RESULT COMPARISON INPUT PANEL -->
+    <section class="panel-section no-print" id="comparison-controls">
         <h2>Result Comparison Data Entry & Backup</h2>
         <p style="font-size: 13px; color: #555;">Manage rows and use JSON Backup & Restore to secure or load all your records instantly.</p>
 
         <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
-            <button type="button" class="add-year-btn" onclick="addYearRow()">+ Add Year</button>
+            <button type="button" class="add-row-btn" onclick="addYearRow()">+ Add Year</button>
             <button type="button" class="backup-btn" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
             <button type="button" class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
         </div>
@@ -278,8 +520,14 @@
         <table class="comparison-table-input">
             <thead>
                 <tr>
-                    <th>Year</th><th>Subject / Class</th><th>Appeared</th><th>Passed</th>
-                    <th>Failed (Auto)</th><th>School % (Auto)</th><th>Board % (Manual)</th><th>Action</th>
+                    <th>Year</th>
+                    <th>Subject / Class</th>
+                    <th>Appeared</th>
+                    <th>Passed</th>
+                    <th>Failed (Auto)</th>
+                    <th>School % (Auto)</th>
+                    <th>Board % (Manual)</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="input-table-body"></tbody>
@@ -290,7 +538,8 @@
         </div>
     </section>
 
-    <section class="comparison-report" id="comparison-report">
+    <!-- MULTI-YEAR COMPARISON PRINTABLE REPORT -->
+    <section class="comparison-report" id="comparison-report" style="display:none;">
         <h2>RESULT COMPARISON REPORT</h2>
         <h3 id="out-report-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
         <div class="report-meta">Comparison of Annual Examination Results</div>
@@ -298,8 +547,14 @@
         <table class="comparison-table">
             <thead>
                 <tr>
-                    <th>Year</th><th>Subject / Class</th><th>Appeared</th><th>Passed</th>
-                    <th>Failed</th><th>School Pass %</th><th>Board Pass %</th><th>Status</th>
+                    <th>Year</th>
+                    <th>Subject / Class</th>
+                    <th>Appeared</th>
+                    <th>Passed</th>
+                    <th>Failed</th>
+                    <th>School Pass %</th>
+                    <th>Board Pass %</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody id="report-table-body"></tbody>
@@ -422,28 +677,88 @@
     </div>
 
     <script>
-        let yearData = [
-            { year: '2024', subject: '10th Computer Science', appeared: 50, passed: 45, board: 85.50 },
-            { year: '2025', subject: '10th Computer Science', appeared: 60, passed: 54, board: 88.00 },
-            { year: '2026', subject: '10th Computer Science', appeared: 65, passed: 61, board: 89.20 }
+        let synopsisData = [
+            { period: '21-06-1989\nTo\n31-12-1989', post: 'SST CS', integrity: '', assessment: '', remarks: 'Reporting Officer has been expired.', adverse: '', promotion: '' },
+            { period: '01-01-1995\nTo\n31-12-1995', post: 'SST CS', integrity: 'Honest', assessment: 'Good', remarks: 'His Work and conduct is Excellent.', adverse: 'Nil', promotion: 'Fit for promotion in his turn.' },
+            { period: '01-01-2023\nTo\nPresent', post: 'SST CS', integrity: 'Honest', assessment: 'Good', remarks: 'Work and conduct excellent.', adverse: 'Nil', promotion: 'Fit for promotion in his turn.' }
         ];
 
-        // Single source of truth for the head→office mapping
+        let yearData = [
+            { year: '2024', subject: '10th Computer Science', appeared: 50, passed: 45, board: 85.50 },
+            { year: '2025', subject: '10th Computer Science', appeared: 60, passed: 54, board: 88.00 }
+        ];
+
+        // Single source of truth for head→office mapping (matches <option> values exactly)
         const HEAD_TO_OFFICE = {
             "HEADMASTER": "Office of the Headmaster",
             "HEADMISTRESS": "Office of the Headmistress",
             "PRINCIPAL": "Office of the Principal",
             "SENIOR HEADMASTER": "Office of the Senior Headmaster",
             "SENIOR HEADMISTRESS": "Office of the Senior Headmistress",
-            "AEO": "Office of the Assistant Education Officer",
-            "DEPUTY DEO (MALE)": "Office of the Deputy District Education Officer (Male)",
-            "DEPUTY DEO (FEMALE)": "Office of the Deputy District Education Officer (Female)",
+            "AEO": "Office of the AEO",
+            "DEPUTY DEO (MALE)": "Office of the Deputy DEO (Male)",
+            "DEPUTY DEO (FEMALE)": "Office of the Deputy DEO (Female)",
             "DEO (SE)": "Office of the DEO (SE)",
-            "DEO (E/MALE)": "Office of the District Education Officer (E/Male)",
-            "DEO (E/FEMALE)": "Office of the District Education Officer (E/Female)",
-            "CEO": "Office of the Chief Executive Officer"
+            "DEO (E/MALE)": "Office of the DEO (E/Male)",
+            "DEO (E/FEMALE)": "Office of the DEO (E/Female)",
+            "CEO": "Office of the CEO"
         };
 
+        // ---------- SYNOPSIS ----------
+        function renderSynopsisTable() {
+            let html = '';
+            synopsisData.forEach((item, index) => {
+                html += `
+                    <tr data-syn-index="${index}">
+                        <td><textarea oninput="updateSynopsisData(${index}, 'period', this.value)">${item.period}</textarea></td>
+                        <td><input type="text" value="${item.post}" oninput="updateSynopsisData(${index}, 'post', this.value)"></td>
+                        <td><input type="text" value="${item.integrity}" oninput="updateSynopsisData(${index}, 'integrity', this.value)"></td>
+                        <td><input type="text" value="${item.assessment}" oninput="updateSynopsisData(${index}, 'assessment', this.value)"></td>
+                        <td><textarea style="height:60px;" oninput="updateSynopsisData(${index}, 'remarks', this.value)">${item.remarks}</textarea></td>
+                        <td><input type="text" value="${item.adverse}" oninput="updateSynopsisData(${index}, 'adverse', this.value)"></td>
+                        <td><input type="text" value="${item.promotion}" oninput="updateSynopsisData(${index}, 'promotion', this.value)"></td>
+                        <td><button type="button" class="del-row-btn" onclick="deleteSynopsisRow(${index})">X</button></td>
+                    </tr>
+                `;
+            });
+            document.getElementById('synopsis-input-tbody').innerHTML = html;
+            syncSynopsisReport();
+        }
+
+        function addSynopsisRow() {
+            synopsisData.push({ period: '01-01-2026\nTo\n31-12-2026', post: 'SST CS', integrity: 'Honest', assessment: 'Good', remarks: 'Work and conduct excellent.', adverse: 'Nil', promotion: 'Fit for promotion in his turn.' });
+            renderSynopsisTable();
+        }
+
+        function deleteSynopsisRow(index) {
+            synopsisData.splice(index, 1);
+            renderSynopsisTable();
+        }
+
+        function updateSynopsisData(index, field, value) {
+            synopsisData[index][field] = value;
+            syncSynopsisReport();
+        }
+
+        function syncSynopsisReport() {
+            let html = '';
+            synopsisData.forEach(item => {
+                html += `
+                    <tr>
+                        <td style="text-align:center; white-space:pre-line;">${item.period || '—'}</td>
+                        <td style="text-align:center;">${item.post || '—'}</td>
+                        <td style="text-align:center;">${item.integrity || '—'}</td>
+                        <td style="text-align:center;">${item.assessment || '—'}</td>
+                        <td style="white-space:pre-line;">${item.remarks || '—'}</td>
+                        <td style="text-align:center;">${item.adverse || '—'}</td>
+                        <td style="text-align:center;">${item.promotion || '—'}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('synopsis-report-tbody').innerHTML = html;
+        }
+
+        // ---------- COMPARISON ----------
         function renderTable() {
             let inputHTML = '';
             yearData.forEach((item, index) => {
@@ -502,33 +817,42 @@
             syncComparisonReport();
         }
 
-        // FIXED: uses shared mapping, HTML options now match exactly
         function onHeadTitleChange() {
             const headTitleVal = document.getElementById('input-head-title').value;
             const officeTitleSelect = document.getElementById('input-office-title');
-
             const target = HEAD_TO_OFFICE[headTitleVal];
             if (target) {
-                officeTitleSelect.value = target;   // direct assignment, works if option exists
+                officeTitleSelect.value = target;
                 if (officeTitleSelect.value !== target) {
-                    // No matching option — log for debugging
-                    console.warn("No <option> found for office title:", target);
+                    console.warn("No <option> matches office title:", target);
                 }
             }
             syncData();
         }
 
+        // ---------- BACKUP / RESTORE ----------
         function backupToJson() {
             const allData = {
                 employeeName: document.getElementById('input-name').value,
+                fatherName: document.getElementById('input-father').value,
+                dob: document.getElementById('input-dob').value,
+                doappt: document.getElementById('input-doappt').value,
+                dopresent: document.getElementById('input-dopresent').value,
                 designation: document.getElementById('input-designation').value,
                 bps: document.getElementById('input-bps').value,
                 cnic: document.getElementById('input-cnic').value,
+                qualification: document.getElementById('input-qualification').value,
                 headTitle: document.getElementById('input-head-title').value,
                 officeTitle: document.getElementById('input-office-title').value,
                 schoolName: document.getElementById('input-school-name').value,
                 tehsil: document.getElementById('input-tehsil').value,
                 district: document.getElementById('input-district').value,
+                appNo: document.getElementById('app-input-no').value,
+                appDate: document.getElementById('app-input-date').value,
+                appRecipient: document.getElementById('app-input-recipient').value,
+                appTargetRank: document.getElementById('app-input-target-rank').value,
+                appEmis: document.getElementById('app-input-emis').value,
+                synopsisRows: synopsisData,
                 years: yearData
             };
 
@@ -550,31 +874,42 @@
                         const parsedData = JSON.parse(e.target.result);
 
                         if (parsedData.employeeName) document.getElementById('input-name').value = parsedData.employeeName;
+                        if (parsedData.fatherName) document.getElementById('input-father').value = parsedData.fatherName;
+                        if (parsedData.dob) document.getElementById('input-dob').value = parsedData.dob;
+                        if (parsedData.doappt) document.getElementById('input-doappt').value = parsedData.doappt;
+                        if (parsedData.dopresent) document.getElementById('input-dopresent').value = parsedData.dopresent;
                         if (parsedData.designation) document.getElementById('input-designation').value = parsedData.designation;
                         if (parsedData.bps) document.getElementById('input-bps').value = parsedData.bps;
                         if (parsedData.cnic) document.getElementById('input-cnic').value = parsedData.cnic;
+                        if (parsedData.qualification) document.getElementById('input-qualification').value = parsedData.qualification;
                         if (parsedData.schoolName) document.getElementById('input-school-name').value = parsedData.schoolName;
                         if (parsedData.tehsil) document.getElementById('input-tehsil').value = parsedData.tehsil;
                         if (parsedData.district) document.getElementById('input-district').value = parsedData.district;
+                        if (parsedData.appNo) document.getElementById('app-input-no').value = parsedData.appNo;
+                        if (parsedData.appDate) document.getElementById('app-input-date').value = parsedData.appDate;
+                        if (parsedData.appRecipient) document.getElementById('app-input-recipient').value = parsedData.appRecipient;
+                        if (parsedData.appTargetRank) document.getElementById('app-input-target-rank').value = parsedData.appTargetRank;
+                        if (parsedData.appEmis) document.getElementById('app-input-emis').value = parsedData.appEmis;
 
                         // Head title first
                         if (parsedData.headTitle) {
                             document.getElementById('input-head-title').value = parsedData.headTitle;
                         }
-
-                        // Try to restore office title; if the saved value doesn't exist as an option,
-                        // fall back to derived value from head title.
+                        // Office title — try explicit, fallback derive if mismatched
                         if (parsedData.officeTitle) {
                             const sel = document.getElementById('input-office-title');
                             sel.value = parsedData.officeTitle;
                             if (sel.value !== parsedData.officeTitle) {
-                                // Option not present — derive from head title instead
                                 onHeadTitleChange();
                             }
                         } else if (parsedData.headTitle) {
                             onHeadTitleChange();
                         }
 
+                        if (parsedData.synopsisRows && Array.isArray(parsedData.synopsisRows)) {
+                            synopsisData = parsedData.synopsisRows;
+                            renderSynopsisTable();
+                        }
                         if (parsedData.years && Array.isArray(parsedData.years)) {
                             yearData = parsedData.years;
                             renderTable();
@@ -585,27 +920,51 @@
                     } catch (error) {
                         alert("Invalid JSON file format!");
                     } finally {
-                        event.target.value = "";
+                        event.target.value = "";  // allow re-selecting the same file
                     }
                 };
             }
         }
 
+        // ---------- GLOBAL SYNC ----------
         function syncData() {
             const name = document.getElementById('input-name').value;
+            const father = document.getElementById('input-father').value;
+            const dob = document.getElementById('input-dob').value;
+            const doappt = document.getElementById('input-doappt').value;
+            const dopresent = document.getElementById('input-dopresent').value;
             const designation = document.getElementById('input-designation').value;
             const bps = document.getElementById('input-bps').value;
             const cnic = document.getElementById('input-cnic').value;
+            const qualification = document.getElementById('input-qualification').value;
             const schoolName = document.getElementById('input-school-name').value;
             const tehsil = document.getElementById('input-tehsil').value;
             const district = document.getElementById('input-district').value;
             const headTitle = document.getElementById('input-head-title').value;
             const officeTitle = document.getElementById('input-office-title').value;
 
+            const appNo = document.getElementById('app-input-no').value;
+            const appDate = document.getElementById('app-input-date').value;
+            const appRecipient = document.getElementById('app-input-recipient').value;
+            const appTargetRank = document.getElementById('app-input-target-rank').value;
+            const appEmis = document.getElementById('app-input-emis').value;
+
+            document.getElementById('out-app-no').textContent = appNo;
+            document.getElementById('out-app-date').textContent = appDate;
+            document.getElementById('out-app-recipient').textContent = appRecipient;
+            document.getElementById('out-app-target-rank').textContent = appTargetRank;
+            document.getElementById('out-app-target-rank-body').textContent = appTargetRank;
+            document.getElementById('out-app-emis').textContent = appEmis;
+
             document.querySelectorAll('.sync-name').forEach(el => el.textContent = name);
+            document.querySelectorAll('.sync-father').forEach(el => el.textContent = father);
+            document.querySelectorAll('.sync-dob').forEach(el => el.textContent = dob);
+            document.querySelectorAll('.sync-doappt').forEach(el => el.textContent = doappt);
+            document.querySelectorAll('.sync-dopresent').forEach(el => el.textContent = dopresent);
             document.querySelectorAll('.sync-designation').forEach(el => el.textContent = designation);
             document.querySelectorAll('.sync-bps').forEach(el => el.textContent = bps);
             document.querySelectorAll('.sync-cnic').forEach(el => el.textContent = cnic);
+            document.querySelectorAll('.sync-qualification').forEach(el => el.textContent = qualification);
             document.querySelectorAll('.sync-school-name').forEach(el => el.textContent = schoolName);
             document.querySelectorAll('.sync-tehsil').forEach(el => el.textContent = tehsil);
             document.querySelectorAll('.sync-district').forEach(el => el.textContent = district);
@@ -615,13 +974,28 @@
 
         function switchTab(tab) {
             const certificates = tab === 'certificates';
+            const application = tab === 'application';
+            const synopsis = tab === 'synopsis';
+            const comparison = tab === 'comparison';
+
             document.getElementById('certificate-controls').classList.toggle('hidden-view', !certificates);
             document.querySelectorAll('.certificate-page').forEach(el => el.classList.toggle('hidden-view', !certificates));
-            document.getElementById('comparison-controls').style.display = certificates ? 'none' : 'block';
-            document.getElementById('comparison-report').style.display = certificates ? 'none' : 'block';
+
+            document.getElementById('application-controls').style.display = application ? 'block' : 'none';
+            document.getElementById('application-report').style.display = application ? 'block' : 'none';
+
+            document.getElementById('synopsis-controls').style.display = synopsis ? 'block' : 'none';
+            document.getElementById('synopsis-report').style.display = synopsis ? 'block' : 'none';
+
+            document.getElementById('comparison-controls').style.display = comparison ? 'block' : 'none';
+            document.getElementById('comparison-report').style.display = comparison ? 'block' : 'none';
+
             document.getElementById('tab-certificates').classList.toggle('active', certificates);
-            document.getElementById('tab-comparison').classList.toggle('active', !certificates);
-            document.body.classList.remove('print-certificates', 'print-comparison');
+            document.getElementById('tab-application').classList.toggle('active', application);
+            document.getElementById('tab-synopsis').classList.toggle('active', synopsis);
+            document.getElementById('tab-comparison').classList.toggle('active', comparison);
+
+            document.body.classList.remove('print-certificates', 'print-application', 'print-synopsis', 'print-comparison');
         }
 
         function syncComparisonReport() {
@@ -662,23 +1036,39 @@
         }
 
         function printCertificates() {
-            document.body.classList.remove('print-comparison');
+            document.body.classList.remove('print-application', 'print-synopsis', 'print-comparison');
             document.body.classList.add('print-certificates');
+            window.print();
+        }
+
+        function printApplication() {
+            syncData();
+            document.body.classList.remove('print-certificates', 'print-synopsis', 'print-comparison');
+            document.body.classList.add('print-application');
+            window.print();
+        }
+
+        function printSynopsis() {
+            syncSynopsisReport();
+            document.body.classList.remove('print-certificates', 'print-application', 'print-comparison');
+            document.body.classList.add('print-synopsis');
             window.print();
         }
 
         function printComparison() {
             syncComparisonReport();
-            document.body.classList.remove('print-certificates');
+            document.body.classList.remove('print-certificates', 'print-application', 'print-synopsis');
             document.body.classList.add('print-comparison');
             window.print();
         }
 
         window.addEventListener('afterprint', function () {
-            document.body.classList.remove('print-certificates', 'print-comparison');
+            document.body.classList.remove('print-certificates', 'print-application', 'print-synopsis', 'print-comparison');
         });
 
+        // Initialize
         syncData();
+        renderSynopsisTable();
         renderTable();
     </script>
 </body>
