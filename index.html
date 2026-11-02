@@ -282,10 +282,21 @@
                 <input type="text" id="input-cnic" value="36302-1234567-1" oninput="syncData()">
             </div>
             <div class="form-group">
-                <label>Head Title:</label>
-                <select id="input-head-title" onchange="syncData()">
+                <label>Head Title (Signatory Designation):</label>
+                <select id="input-head-title" onchange="onHeadTitleChange()">
                     <option value="HEADMASTER" selected>HEADMASTER</option>
                     <option value="HEADMISTRESS">HEADMISTRESS</option>
+                    <option value="PRINCIPAL">PRINCIPAL</option>
+                    <option value="SENIOR HEADMASTER">SENIOR HEADMASTER</option>
+                    <option value="SENIOR HEADMISTRESS">SENIOR HEADMISTRESS</option>
+                    <option value="DEPUTY HEADMASTER">DEPUTY HEADMASTER</option>
+                    <option value="DEPUTY HEADMISTRESS">DEPUTY HEADMISTRESS</option>
+                    <option value="AEO">AEO</option>
+                    <option value="DEPUTY FEMALE">DEPUTY FEMALE</option>
+                    <option value="DEO (SE)">DEO (SE)</option>
+                    <option value="DEO (E/MALE)">DEO (E/MALE)</option>
+                    <option value="DEO (E/FEMALE)">DEO (E/FEMALE)</option>
+                    <option value="CEO">CEO</option>
                 </select>
             </div>
             <div class="form-group">
@@ -293,14 +304,25 @@
                 <select id="input-office-title" onchange="syncData()">
                     <option value="Office of the Headmaster" selected>Office of the Headmaster</option>
                     <option value="Office of the Headmistress">Office of the Headmistress</option>
+                    <option value="Office of the Principal">Office of the Principal</option>
+                    <option value="Office of the Senior Headmaster">Office of the Senior Headmaster</option>
+                    <option value="Office of the Senior Headmistress">Office of the Senior Headmistress</option>
+                    <option value="Office of the Deputy Headmaster">Office of the Deputy Headmaster</option>
+                    <option value="Office of the Deputy Headmistress">Office of the Deputy Headmistress</option>
+                    <option value="Office of the AEO">Office of the AEO</option>
+                    <option value="Office of the Deputy Female">Office of the Deputy Female</option>
+                    <option value="Office of the DEO (SE)">Office of the DEO (SE)</option>
+                    <option value="Office of the DEO (E/Male)">Office of the DEO (E/Male)</option>
+                    <option value="Office of the DEO (E/Female)">Office of the DEO (E/Female)</option>
+                    <option value="Office of the CEO">Office of the CEO</option>
                 </select>
             </div>
             <div class="form-group full-width">
-                <label>School Name & Location:</label>
+                <label>School / Office Name & Location:</label>
                 <input type="text" id="input-school" value="Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal" oninput="syncData()">
             </div>
 
-            <!-- GLOBAL BACKUP & RESTORE BUTTONS IN CERTIFICATE PANEL AS WELL -->
+            <!-- GLOBAL BACKUP & RESTORE BUTTONS IN CERTIFICATE PANEL -->
             <div class="form-group full-width" style="margin-top: 10px; border-top: 1px solid #cbd5e1; padding-top: 10px;">
                 <label>Global Data Backup & Restore:</label>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
@@ -387,7 +409,7 @@
         </div>
 
         <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | Ghulam Muhammad SST-IT WhatsApp: +92 333 6283082
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
         </div>
     </section>
 
@@ -416,7 +438,7 @@
             <p><span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span></p>
         </div>
         <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | Ghulam Muhammad SST-IT WhatsApp: +92 333 6283082
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
         </div>
     </div>
 
@@ -443,7 +465,7 @@
             <p><span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span></p>
         </div>
         <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | Ghulam Muhammad SST-IT WhatsApp: +92 333 6283082
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
         </div>
     </div>
 
@@ -470,7 +492,7 @@
             <p><span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span></p>
         </div>
         <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | Ghulam Muhammad SST-IT WhatsApp: +92 333 6283082
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
         </div>
     </div>
 
@@ -499,7 +521,7 @@
             <p><span class="sync-school">Govt. High School 175/9-L Tehsil Chichawatni District Sahiwal</span></p>
         </div>
         <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | Ghulam Muhammad SST-IT WhatsApp: +92 333 6283082
+            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
         </div>
     </div>
 
@@ -560,6 +582,39 @@
                 row.querySelector('.row-srate').textContent = srate.toFixed(2) + '%';
             }
             syncComparisonReport();
+        }
+
+        // --- AUTO-UPDATE OFFICE TITLE BASED ON HEAD TITLE ---
+        function onHeadTitleChange() {
+            const headTitleVal = document.getElementById('input-head-title').value;
+            const officeTitleSelect = document.getElementById('input-office-title');
+            
+            // Map Head Title to matching Office Title option
+            let correspondingOffice = "Office of the " + headTitleVal.toLowerCase();
+            
+            // Format nicely with proper casing
+            if (headTitleVal === "HEADMASTER") correspondingOffice = "Office of the Headmaster";
+            else if (headTitleVal === "HEADMISTRESS") correspondingOffice = "Office of the Headmistress";
+            else if (headTitleVal === "PRINCIPAL") correspondingOffice = "Office of the Principal";
+            else if (headTitleVal === "SENIOR HEADMASTER") correspondingOffice = "Office of the Senior Headmaster";
+            else if (headTitleVal === "SENIOR HEADMISTRESS") correspondingOffice = "Office of the Senior Headmistress";
+            else if (headTitleVal === "DEPUTY HEADMASTER") correspondingOffice = "Office of the Deputy Headmaster";
+            else if (headTitleVal === "DEPUTY HEADMISTRESS") correspondingOffice = "Office of the Deputy Headmistress";
+            else if (headTitleVal === "AEO") correspondingOffice = "Office of the AEO";
+            else if (headTitleVal === "DEPUTY FEMALE") correspondingOffice = "Office of the Deputy Female";
+            else if (headTitleVal === "DEO (SE)") correspondingOffice = "Office of the DEO (SE)";
+            else if (headTitleVal === "DEO (E/MALE)") correspondingOffice = "Office of the DEO (E/Male)";
+            else if (headTitleVal === "DEO (E/FEMALE)") correspondingOffice = "Office of the DEO (E/Female)";
+            else if (headTitleVal === "CEO") correspondingOffice = "Office of the CEO (DEA)";
+
+            // Check if option exists in dropdown, select it
+            for (let i = 0; i < officeTitleSelect.options.length; i++) {
+                if (officeTitleSelect.options[i].value === correspondingOffice) {
+                    officeTitleSelect.selectedIndex = i;
+                    break;
+                }
+            }
+            syncData();
         }
 
         // --- COMPLETE JSON BACKUP & RESTORE FUNCTIONS ---
