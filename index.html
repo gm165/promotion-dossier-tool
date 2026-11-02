@@ -24,133 +24,63 @@
             margin-right: auto;
             box-sizing: border-box;
         }
-        .no-print h3 {
-            margin-top: 0;
-            color: #1a365d;
-            font-size: 18px;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-        .form-group label {
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 4px;
-            color: #333;
-        }
+        .no-print h3 { margin-top: 0; color: #1a365d; font-size: 18px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: span 2; }
+        .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #333; }
         .form-group input, .form-group select {
-            padding: 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box;
+            padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;
+            font-size: 14px; width: 100%; box-sizing: border-box;
         }
         .print-btn {
-            grid-column: span 2;
-            background-color: #2563eb;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 4px;
-            font-size: 15px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 5px;
-            width: 100%;
+            grid-column: span 2; background-color: #2563eb; color: white;
+            padding: 12px; border: none; border-radius: 4px; font-size: 15px;
+            cursor: pointer; font-weight: bold; margin-top: 5px; width: 100%;
         }
-        .print-btn:hover {
-            background-color: #1d4ed8;
-        }
+        .print-btn:hover { background-color: #1d4ed8; }
 
         /* Certificate Page Layout */
         .certificate-page {
             background: white;
             width: 100%;
             max-width: 210mm;
-            height: 270mm;
-            padding: 15mm 20mm 15mm 20mm;
+            min-height: 270mm;              /* FIX: min-height so content isn't clipped on screen */
+            padding: 15mm 20mm;
             margin: 0 auto 20px auto;
             box-sizing: border-box;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             position: relative;
             break-after: page;
             break-inside: avoid;
-            overflow: hidden;
         }
 
         .header-box {
-            text-align: center;
-            border-bottom: 2px solid #000;
-            padding-bottom: 8px;
-            margin-bottom: 20px;
+            text-align: center; border-bottom: 2px solid #000;
+            padding-bottom: 8px; margin-bottom: 20px;
         }
-        .header-box h2 {
-            margin: 0;
-            font-size: 16px;
-            text-transform: uppercase;
-        }
-        .header-box h3 {
-            margin: 4px 0 0 0;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
+        .header-box h2 { margin: 0; font-size: 16px; text-transform: uppercase; }
+        .header-box h3 { margin: 4px 0 0 0; font-size: 14px; text-transform: uppercase; }
 
         .cert-title {
-            text-align: center;
-            font-size: 15px;
-            font-weight: bold;
-            text-decoration: underline;
-            margin: 15px 0 15px 0;
-            text-transform: uppercase;
+            text-align: center; font-size: 15px; font-weight: bold;
+            text-decoration: underline; margin: 15px 0; text-transform: uppercase;
         }
 
-        .cert-body {
-            font-size: 14px;
-            text-align: justify;
-            margin-bottom: 30px;
-        }
-        .cert-body ol {
-            margin-top: 8px;
-            padding-left: 20px;
-        }
-        .cert-body li {
-            margin-bottom: 6px;
-        }
+        .cert-body { font-size: 14px; text-align: justify; margin-bottom: 30px; }
+        .cert-body ol { margin-top: 8px; padding-left: 20px; }
+        .cert-body li { margin-bottom: 6px; }
 
         .signature-section {
-            position: absolute;
-            bottom: 22mm;
-            right: 20mm;
-            text-align: left;
-            width: 240px;
+            position: absolute; bottom: 22mm; right: 20mm;
+            text-align: left; width: 240px;
         }
-        .signature-section p {
-            margin: 2px 0;
-            font-size: 13px;
-            font-weight: bold;
-        }
+        .signature-section p { margin: 2px 0; font-size: 13px; font-weight: bold; }
 
-        /* Brand Footer */
         .brand-footer {
-            position: absolute;
-            bottom: 8mm;
-            left: 20mm;
-            right: 20mm;
-            text-align: center;
-            font-size: 11px;
-            color: #555;
-            border-top: 1px solid #cbd5e1;
-            padding-top: 4px;
+            position: absolute; bottom: 8mm; left: 20mm; right: 20mm;
+            text-align: center; font-size: 11px; color: #555;
+            border-top: 1px solid #cbd5e1; padding-top: 4px;
         }
 
         /* Tabs and Comparison Panel Styling */
@@ -163,7 +93,7 @@
             color: #1e293b; padding: 11px 16px; font-weight: bold; cursor: pointer;
         }
         .tab-button.active { color: #fff; background: #1d4ed8; border-color: #1d4ed8; }
-        
+
         .comparison-panel {
             display: none; max-width: 950px; margin: 0 auto 20px; background: #fff;
             padding: 18px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.1);
@@ -180,7 +110,8 @@
         }
         .comparison-table-input th { background: #f8fafc; }
         .comparison-table-input input {
-            width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;
+            width: 100%; padding: 6px; box-sizing: border-box;
+            border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;
         }
         .add-year-btn {
             background-color: #16a34a; color: white; border: none; padding: 8px 14px;
@@ -189,12 +120,14 @@
         .add-year-btn:hover { background-color: #15803d; }
         .backup-btn {
             background-color: #0284c7; color: white; border: none; padding: 8px 14px;
-            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 10px; margin-left: 5px;
+            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;
+            margin-bottom: 10px; margin-left: 5px;
         }
         .backup-btn:hover { background-color: #0369a1; }
         .restore-btn {
             background-color: #d97706; color: white; border: none; padding: 8px 14px;
-            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 10px; margin-left: 5px;
+            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;
+            margin-bottom: 10px; margin-left: 5px;
         }
         .restore-btn:hover { background-color: #b45309; }
         .del-row-btn {
@@ -205,10 +138,8 @@
 
         .comparison-report {
             display: none; max-width: 210mm; margin: 0 auto 20px; background: #fff;
-            padding: 15mm 20mm 15mm 20mm; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,.1);
-            position: relative;
-            height: 270mm;
-            overflow: hidden;
+            padding: 15mm 20mm; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,.1);
+            position: relative; min-height: 270mm;
         }
         .comparison-report h2, .comparison-report h3 { text-align: center; margin: 5px 0; }
         .comparison-report .report-meta { text-align: center; margin: 8px 0 18px; font-size: 14px; }
@@ -218,38 +149,34 @@
 
         .hidden-view { display: none !important; }
 
-        /* Print Adjustments to Prevent Blank Pages */
+        /* Print Adjustments */
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 0;
-            }
+            @page { size: A4 portrait; margin: 0; }
             body { background: none; padding: 0; margin: 0; }
             .no-print { display: none !important; }
-            
+
             body.print-comparison .certificate-page,
             body.print-comparison #certificate-controls,
-            body.print-comparison .tab-bar { display: none !important; }
+            body.print-comparison .tab-bar,
             body.print-comparison #comparison-controls { display: none !important; }
-            
+
             body.print-comparison #comparison-report {
-                display: block !important; width: 210mm; height: 297mm; max-width: none;
+                display: block !important; width: 210mm; min-height: 297mm; max-width: none;
                 margin: 0 !important; padding: 15mm 20mm; box-shadow: none !important;
                 page-break-after: avoid; page-break-inside: avoid;
             }
-            
+
             body.print-certificates #comparison-controls,
             body.print-certificates #comparison-report,
             body.print-certificates .tab-bar { display: none !important; }
 
             .certificate-page {
-                box-shadow: none; margin: 0; width: 210mm; height: 297mm;
-                max-width: none; padding: 15mm 20mm; page-break-after: always;
+                box-shadow: none; margin: 0; width: 210mm; min-height: 297mm;
+                max-width: none; padding: 15mm 20mm;
+                page-break-after: always;
                 page-break-inside: avoid;
             }
-            .certificate-page:last-of-type {
-                page-break-after: avoid;
-            }
+            .certificate-page:last-of-type { page-break-after: auto; }   /* FIX: auto not avoid */
         }
     </style>
 </head>
@@ -328,7 +255,6 @@
                 <input type="text" id="input-district" value="District Sahiwal" oninput="syncData()">
             </div>
 
-            <!-- GLOBAL BACKUP & RESTORE BUTTONS IN CERTIFICATE PANEL -->
             <div class="form-group full-width" style="margin-top: 10px; border-top: 1px solid #cbd5e1; padding-top: 10px;">
                 <label>Global Data Backup & Restore:</label>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
@@ -346,7 +272,7 @@
     <section class="comparison-panel" id="comparison-controls">
         <h2>Result Comparison Data Entry & Backup</h2>
         <p style="font-size: 13px; color: #555;">Manage rows and use JSON Backup & Restore to secure or load all your records instantly.</p>
-        
+
         <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
             <button type="button" class="add-year-btn" onclick="addYearRow()">+ Add Year</button>
             <button type="button" class="backup-btn" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
@@ -356,19 +282,11 @@
         <table class="comparison-table-input">
             <thead>
                 <tr>
-                    <th>Year</th>
-                    <th>Subject / Class</th>
-                    <th>Appeared</th>
-                    <th>Passed</th>
-                    <th>Failed (Auto)</th>
-                    <th>School % (Auto)</th>
-                    <th>Board % (Manual)</th>
-                    <th>Action</th>
+                    <th>Year</th><th>Subject / Class</th><th>Appeared</th><th>Passed</th>
+                    <th>Failed (Auto)</th><th>School % (Auto)</th><th>Board % (Manual)</th><th>Action</th>
                 </tr>
             </thead>
-            <tbody id="input-table-body">
-                <!-- Rows injected dynamically via JS -->
-            </tbody>
+            <tbody id="input-table-body"></tbody>
         </table>
 
         <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -381,23 +299,15 @@
         <h2>RESULT COMPARISON REPORT</h2>
         <h3 id="out-report-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
         <div class="report-meta">Comparison of Annual Examination Results</div>
-        
+
         <table class="comparison-table">
             <thead>
                 <tr>
-                    <th>Year</th>
-                    <th>Subject / Class</th>
-                    <th>Appeared</th>
-                    <th>Passed</th>
-                    <th>Failed</th>
-                    <th>School Pass %</th>
-                    <th>Board Pass %</th>
-                    <th>Status</th>
+                    <th>Year</th><th>Subject / Class</th><th>Appeared</th><th>Passed</th>
+                    <th>Failed</th><th>School Pass %</th><th>Board Pass %</th><th>Status</th>
                 </tr>
             </thead>
-            <tbody id="report-table-body">
-                <!-- Dynamically populated via script -->
-            </tbody>
+            <tbody id="report-table-body"></tbody>
         </table>
 
         <p style="font-size: 13px; margin-top: 20px;">This comparative statement reflects the academic performance and standard of instruction maintained at the institution over consecutive years in comparison with the BISE results.</p>
@@ -436,9 +346,7 @@
             <p><span class="sync-head-title">HEADMASTER</span></p>
             <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
         </div>
-        <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
-        </div>
+        <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
     </div>
 
     <!-- 2. NO DEMAND & NO AUDIT PARAS CERTIFICATE -->
@@ -463,9 +371,7 @@
             <p><span class="sync-head-title">HEADMASTER</span></p>
             <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
         </div>
-        <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
-        </div>
+        <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
     </div>
 
     <!-- 3. REGULAR SERVICE CERTIFICATE -->
@@ -490,9 +396,7 @@
             <p><span class="sync-head-title">HEADMASTER</span></p>
             <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
         </div>
-        <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
-        </div>
+        <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
     </div>
 
     <!-- 4. NO LPR / NO OPTION CERTIFICATE -->
@@ -519,13 +423,10 @@
             <p><span class="sync-head-title">HEADMASTER</span></p>
             <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
         </div>
-        <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
-        </div>
+        <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
     </div>
 
     <script>
-        // Initial sample data rows with Subject / Class
         let yearData = [
             { year: '2024', subject: '10th Computer Science', appeared: 50, passed: 45, board: 85.50 },
             { year: '2025', subject: '10th Computer Science', appeared: 60, passed: 54, board: 88.00 },
@@ -535,14 +436,19 @@
         function renderTable() {
             let inputHTML = '';
             yearData.forEach((item, index) => {
+                const appeared = Math.max(0, parseInt(item.appeared) || 0);
+                const passed = Math.max(0, parseInt(item.passed) || 0);
+                const fail = Math.max(0, appeared - passed);
+                const srate = appeared > 0 ? (passed / appeared) * 100 : 0;
+
                 inputHTML += `
                     <tr data-index="${index}">
                         <td><input type="text" class="row-year" value="${item.year}" oninput="updateData(${index}, 'year', this.value)" style="font-weight:bold;"></td>
                         <td><input type="text" class="row-subject" value="${item.subject}" oninput="updateData(${index}, 'subject', this.value)"></td>
                         <td><input type="number" class="row-app" value="${item.appeared}" oninput="updateData(${index}, 'appeared', this.value)"></td>
                         <td><input type="number" class="row-pass" value="${item.passed}" oninput="updateData(${index}, 'passed', this.value)"></td>
-                        <td><span class="row-fail">${Math.max(0, item.appeared - item.passed)}</span></td>
-                        <td><span class="row-srate">${item.appeared > 0 ? ((item.passed / item.appeared) * 100).toFixed(2) + '%' : '0.00%'}</span></td>
+                        <td><span class="row-fail">${fail}</span></td>
+                        <td><span class="row-srate">${srate.toFixed(2)}%</span></td>
                         <td><input type="number" step="0.01" class="row-board" value="${item.board}" oninput="updateData(${index}, 'board', this.value)"></td>
                         <td><button type="button" class="del-row-btn" onclick="deleteYearRow(${index})">X</button></td>
                     </tr>
@@ -553,8 +459,12 @@
         }
 
         function addYearRow() {
-            const nextYear = yearData.length > 0 ? String(parseInt(yearData[yearData.length - 1].year) + 1) : '2027';
-            yearData.push({ year: nextYear, subject: '10th Computer Science', appeared: 50, passed: 45, board: 85.00 });
+            let lastYear = 2026;
+            if (yearData.length > 0) {
+                const parsed = parseInt(yearData[yearData.length - 1].year);
+                if (!isNaN(parsed)) lastYear = parsed;
+            }
+            yearData.push({ year: String(lastYear + 1), subject: '10th Computer Science', appeared: 50, passed: 45, board: 85.00 });
             renderTable();
         }
 
@@ -569,50 +479,50 @@
             } else {
                 yearData[index][field] = parseFloat(value) || 0;
             }
-            
             const row = document.querySelector(`tr[data-index="${index}"]`);
             if (row) {
                 const app = Math.max(0, parseInt(row.querySelector('.row-app').value) || 0);
                 const pass = Math.max(0, parseInt(row.querySelector('.row-pass').value) || 0);
                 const fail = Math.max(0, app - pass);
                 const srate = app > 0 ? (pass / app) * 100 : 0;
-
                 row.querySelector('.row-fail').textContent = fail;
                 row.querySelector('.row-srate').textContent = srate.toFixed(2) + '%';
             }
             syncComparisonReport();
         }
 
-        // --- AUTO-UPDATE OFFICE TITLE BASED ON HEAD TITLE ---
+        // FIXED: AEO mapping
         function onHeadTitleChange() {
             const headTitleVal = document.getElementById('input-head-title').value;
             const officeTitleSelect = document.getElementById('input-office-title');
-            
-            let correspondingOffice = "Office of the " + headTitleVal.toLowerCase();
-            
-            if (headTitleVal === "HEADMASTER") correspondingOffice = "Office of the Headmaster";
-            else if (headTitleVal === "HEADMISTRESS") correspondingOffice = "Office of the Headmistress";
-            else if (headTitleVal === "PRINCIPAL") correspondingOffice = "Office of the Principal";
-            else if (headTitleVal === "SENIOR HEADMASTER") correspondingOffice = "Office of the Senior Headmaster";
-            else if (headTitleVal === "SENIOR HEADMISTRESS") correspondingOffice = "Office of the Senior Headmistress";
-            else if (headTitleVal === "AEO") correspondingOffice = "Office of the Office of the Assistant Education Officer";
-            else if (headTitleVal === "DEPUTY DEO (MALE)") correspondingOffice = "Office of the Deputy DEO (Male)";
-            else if (headTitleVal === "DEPUTY DEO (FEMALE)") correspondingOffice = "Office of the Deputy DEO (Female)";
-            else if (headTitleVal === "DEO (SE)") correspondingOffice = "Office of the DEO (SE)";
-            else if (headTitleVal === "DEO (E/MALE)") correspondingOffice = "Office of the DEO (E/Male)";
-            else if (headTitleVal === "DEO (E/FEMALE)") correspondingOffice = "Office of the DEO (E/Female)";
-            else if (headTitleVal === "CEO") correspondingOffice = "Office of the CEO";
 
-            for (let i = 0; i < officeTitleSelect.options.length; i++) {
-                if (officeTitleSelect.options[i].value === correspondingOffice) {
-                    officeTitleSelect.selectedIndex = i;
-                    break;
+            const map = {
+                "HEADMASTER": "Office of the Headmaster",
+                "HEADMISTRESS": "Office of the Headmistress",
+                "PRINCIPAL": "Office of the Principal",
+                "SENIOR HEADMASTER": "Office of the Senior Headmaster",
+                "SENIOR HEADMISTRESS": "Office of the Senior Headmistress",
+                "AEO": "Office of the AEO",                                  // FIXED
+                "DEPUTY DEO (MALE)": "Office of the Deputy DEO (Male)",
+                "DEPUTY DEO (FEMALE)": "Office of the Deputy DEO (Female)",
+                "DEO (SE)": "Office of the DEO (SE)",
+                "DEO (E/MALE)": "Office of the DEO (E/Male)",
+                "DEO (E/FEMALE)": "Office of the DEO (E/Female)",
+                "CEO": "Office of the CEO"
+            };
+
+            const target = map[headTitleVal];
+            if (target) {
+                for (let i = 0; i < officeTitleSelect.options.length; i++) {
+                    if (officeTitleSelect.options[i].value === target) {
+                        officeTitleSelect.selectedIndex = i;
+                        break;
+                    }
                 }
             }
             syncData();
         }
 
-        // --- COMPLETE JSON BACKUP & RESTORE FUNCTIONS ---
         function backupToJson() {
             const allData = {
                 employeeName: document.getElementById('input-name').value,
@@ -643,31 +553,38 @@
                 fileReader.onload = function (e) {
                     try {
                         const parsedData = JSON.parse(e.target.result);
-                        
+
                         if (parsedData.employeeName) document.getElementById('input-name').value = parsedData.employeeName;
                         if (parsedData.designation) document.getElementById('input-designation').value = parsedData.designation;
                         if (parsedData.bps) document.getElementById('input-bps').value = parsedData.bps;
                         if (parsedData.cnic) document.getElementById('input-cnic').value = parsedData.cnic;
-                        if (parsedData.headTitle) document.getElementById('input-head-title').value = parsedData.headTitle;
-                        if (parsedData.officeTitle) document.getElementById('input-office-title').value = parsedData.officeTitle;
                         if (parsedData.schoolName) document.getElementById('input-school-name').value = parsedData.schoolName;
                         if (parsedData.tehsil) document.getElementById('input-tehsil').value = parsedData.tehsil;
                         if (parsedData.district) document.getElementById('input-district').value = parsedData.district;
-                        
+
+                        // Set head title first, then office title (explicit) — so no mismatch
+                        if (parsedData.headTitle) document.getElementById('input-head-title').value = parsedData.headTitle;
+                        if (parsedData.officeTitle) {
+                            document.getElementById('input-office-title').value = parsedData.officeTitle;
+                        } else if (parsedData.headTitle) {
+                            onHeadTitleChange();   // auto-derive if office missing
+                        }
+
                         if (parsedData.years && Array.isArray(parsedData.years)) {
                             yearData = parsedData.years;
                             renderTable();
                         }
-                        
+
                         syncData();
                         alert("All data restored successfully!");
                     } catch (error) {
                         alert("Invalid JSON file format!");
+                    } finally {
+                        event.target.value = "";  // FIX: allow re-selecting same file
                     }
                 };
             }
         }
-        // ------------------------------------------------
 
         function syncData() {
             const name = document.getElementById('input-name').value;
@@ -713,12 +630,14 @@
                 const diff = schoolRate - boardRate;
 
                 let statusText = '';
-                if (diff > 0) {
-                    statusText = `Above Board`;
-                } else if (diff < 0) {
-                    statusText = `Below Board`;
+                if (appeared === 0 && boardRate === 0) {
+                    statusText = 'No Data';                 // FIX: avoid misleading "Equal"
+                } else if (diff > 0.005) {
+                    statusText = 'Above Board';
+                } else if (diff < -0.005) {
+                    statusText = 'Below Board';
                 } else {
-                    statusText = `Equal to Board`;
+                    statusText = 'Equal to Board';
                 }
 
                 tbodyHTML += `
@@ -734,7 +653,6 @@
                     </tr>
                 `;
             });
-
             document.getElementById('report-table-body').innerHTML = tbodyHTML;
         }
 
@@ -755,7 +673,6 @@
             document.body.classList.remove('print-certificates', 'print-comparison');
         });
 
-        // Initialize on load
         syncData();
         renderTable();
     </script>
