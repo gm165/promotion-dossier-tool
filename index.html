@@ -3,709 +3,1180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Promotion Dossier Management System</title>
+    <title>Education Department – Dossier & Reports System</title>
     <style>
+        /* ==================================================================
+           GLOBAL RESET & BASE
+           ================================================================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             font-family: 'Times New Roman', Times, serif;
             background-color: #f0f2f5;
             color: #000;
-            margin: 0;
             padding: 10px;
             line-height: 1.5;
         }
-        .no-print {
-            background: #ffffff;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+        /* ==================================================================
+           TAB BAR
+           ================================================================== */
+        .tab-bar {
             max-width: 1050px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #f0f2f5;
+            padding: 8px 0;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        .tab-button {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+            color: #1e293b;
+            padding: 10px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 13px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-button.active {
+            color: #fff;
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.35);
+        }
+
+        .tab-button:hover:not(.active) { background: #e2e8f0; }
+
+        .tab-separator {
+            width: 2px;
+            background: #cbd5e1;
+            margin: 0 4px;
+            align-self: stretch;
+        }
+
+        /* ==================================================================
+           SHARED PANEL STYLES
+           ================================================================== */
+        .panel-section {
+            display: none;
+            max-width: 1050px;
+            margin: 0 auto 20px;
+            background: #fff;
+            padding: 18px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
             box-sizing: border-box;
         }
-        .no-print h3 { margin-top: 0; color: #1a365d; font-size: 18px; }
+
+        .panel-section h2 { color: #1e3a5f; margin-top: 0; }
+
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: span 2; }
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #333; }
-        .form-group input, .form-group select {
-            padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;
-            font-size: 14px; width: 100%; box-sizing: border-box;
+
+        .form-group input,
+        .form-group select {
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
             font-family: 'Times New Roman', Times, serif;
         }
+
         .print-btn {
-            grid-column: span 2; background-color: #2563eb; color: white;
-            padding: 12px; border: none; border-radius: 4px; font-size: 15px;
-            cursor: pointer; font-weight: bold; margin-top: 5px; width: 100%;
+            grid-column: span 2;
+            background-color: #2563eb;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 5px;
+            width: 100%;
         }
         .print-btn:hover { background-color: #1d4ed8; }
 
-        /* Page Layout — min-height so screen editing never clips */
+        .add-row-btn { background-color: #16a34a; color: white; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .add-row-btn:hover { background-color: #15803d; }
+        .backup-btn { background-color: #0284c7; color: white; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .backup-btn:hover { background-color: #0369a1; }
+        .restore-btn { background-color: #d97706; color: white; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .restore-btn:hover { background-color: #b45309; }
+        .del-row-btn { background-color: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; }
+        .del-row-btn:hover { background-color: #b91c1c; }
+
+        .table-scroll { overflow-x: auto; }
+
+        /* ==================================================================
+           DOSSIER – CERTIFICATE / REPORT PAGES
+           ================================================================== */
         .certificate-page, .application-page, .comparison-report {
             background: white; width: 100%; max-width: 210mm; min-height: 270mm;
-            padding: 15mm 20mm; margin: 0 auto 20px auto;
-            box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative; break-after: page; break-inside: avoid;
+            padding: 15mm 20mm; margin: 0 auto 20px auto; box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: relative;
+            break-after: page; break-inside: avoid;
         }
         .synopsis-report {
             background: white; width: 100%; max-width: 210mm; min-height: 270mm;
             margin: 0 auto 20px auto; padding: 15mm 15mm 22mm 15mm;
-            box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
+            box-sizing: border-box; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: relative;
         }
 
-        .header-box {
-            text-align: center; border-bottom: 2px solid #000;
-            padding-bottom: 8px; margin-bottom: 20px;
-        }
+        .header-box { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 20px; }
         .header-box h2 { margin: 0; font-size: 16px; text-transform: uppercase; }
         .header-box h3 { margin: 4px 0 0 0; font-size: 14px; text-transform: uppercase; }
 
-        .cert-title {
-            text-align: center; font-size: 15px; font-weight: bold;
-            text-decoration: underline; margin: 15px 0; text-transform: uppercase;
-        }
+        .cert-title { text-align: center; font-size: 15px; font-weight: bold; text-decoration: underline; margin: 15px 0; text-transform: uppercase; }
         .cert-body { font-size: 14px; text-align: justify; margin-bottom: 30px; }
         .cert-body ol { margin-top: 8px; padding-left: 20px; }
         .cert-body li { margin-bottom: 6px; }
 
-        .signature-section {
-            position: absolute; bottom: 22mm; right: 20mm;
-            text-align: left; width: 260px;
-        }
+        .signature-section { position: absolute; bottom: 22mm; right: 20mm; text-align: left; width: 260px; }
         .signature-section p { margin: 2px 0; font-size: 13px; font-weight: bold; }
 
-        .brand-footer {
-            position: absolute; bottom: 8mm; left: 20mm; right: 20mm;
-            text-align: center; font-size: 11px; color: #555;
-            border-top: 1px solid #cbd5e1; padding-top: 4px;
-        }
+        .brand-footer { position: absolute; bottom: 8mm; left: 20mm; right: 20mm; text-align: center; font-size: 11px; color: #555; border-top: 1px solid #cbd5e1; padding-top: 4px; }
 
-        .tab-bar { max-width: 1050px; margin: 0 auto 14px; display: flex; flex-wrap: wrap; gap: 8px; }
-        .tab-button {
-            border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;
-            color: #1e293b; padding: 11px 16px; font-weight: bold; cursor: pointer;
-        }
-        .tab-button.active { color: #fff; background: #1d4ed8; border-color: #1d4ed8; }
-
-        .panel-section {
-            display: none; max-width: 1050px; margin: 0 auto 20px; background: #fff;
-            padding: 18px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.1);
-            box-sizing: border-box;
-        }
-        .panel-section h2 { color: #1e3a5f; margin-top: 0; }
-
-        .table-scroll { overflow-x: auto; }
-
-        .comparison-table-input, .synopsis-input-table {
-            width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px;
-        }
-        .comparison-table-input th, .comparison-table-input td,
-        .synopsis-input-table th, .synopsis-input-table td {
-            border: 1px solid #cbd5e1; padding: 6px; text-align: center; vertical-align: middle;
-        }
+        /* ==================================================================
+           DOSSIER – TABLES
+           ================================================================== */
+        .comparison-table-input, .synopsis-input-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px; }
+        .comparison-table-input th, .comparison-table-input td, .synopsis-input-table th, .synopsis-input-table td { border: 1px solid #cbd5e1; padding: 6px; text-align: center; vertical-align: middle; }
         .comparison-table-input th, .synopsis-input-table th { background: #f8fafc; }
-        .comparison-table-input input, .synopsis-input-table input, .synopsis-input-table textarea {
-            width: 100%; padding: 5px; box-sizing: border-box;
-            border: 1px solid #cbd5e1; border-radius: 4px;
-            font-family: 'Times New Roman', Times, serif; font-size: 12px;
-        }
+        .comparison-table-input input, .synopsis-input-table input, .synopsis-input-table textarea { width: 100%; padding: 5px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 12px; }
         .synopsis-input-table textarea { resize: vertical; height: 45px; }
 
-        .add-row-btn {
-            background-color: #16a34a; color: white; border: none; padding: 8px 14px;
-            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 10px;
-        }
-        .add-row-btn:hover { background-color: #15803d; }
-        .backup-btn {
-            background-color: #0284c7; color: white; border: none; padding: 8px 14px;
-            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;
-            margin-bottom: 10px; margin-left: 5px;
-        }
-        .backup-btn:hover { background-color: #0369a1; }
-        .restore-btn {
-            background-color: #d97706; color: white; border: none; padding: 8px 14px;
-            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;
-            margin-bottom: 10px; margin-left: 5px;
-        }
-        .restore-btn:hover { background-color: #b45309; }
-        .del-row-btn {
-            background-color: #dc2626; color: white; border: none; padding: 4px 8px;
-            border-radius: 3px; cursor: pointer; font-size: 11px;
-        }
-        .del-row-btn:hover { background-color: #b91c1c; }
+        .synopsis-table, .comparison-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }
+        .synopsis-table th, .synopsis-table td, .comparison-table th, .comparison-table td { border: 1px solid #475569; padding: 6px; text-align: left; vertical-align: top; }
+        .synopsis-table th, .comparison-table th { background: #e2e8f0; text-align: center; }
 
-        .synopsis-table, .comparison-table {
-            width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px;
-        }
-        .synopsis-table th, .synopsis-table td,
-        .comparison-table th, .comparison-table td {
-            border: 1px solid #475569; padding: 6px; text-align: left; vertical-align: top;
-        }
-        .synopsis-table th, .comparison-table th {
-            background: #e2e8f0; text-align: center;
-        }
-
-        /* Bio-Data Table in Synopsis Report */
-        .bio-table {
-            width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;
-        }
-        .bio-table td {
-            border: 1px solid #475569; padding: 5px 8px; vertical-align: middle;
-        }
-        .bio-table td.bio-label {
-            background: #e2e8f0; font-weight: bold; width: 38%; text-align: left;
-        }
-        .bio-table td.bio-value {
-            width: 62%; text-align: left;
-        }
+        .bio-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; }
+        .bio-table td { border: 1px solid #475569; padding: 5px 8px; vertical-align: middle; }
+        .bio-table td.bio-label { background: #e2e8f0; font-weight: bold; width: 38%; text-align: left; }
+        .bio-table td.bio-value { width: 62%; text-align: left; }
 
         .hidden-view { display: none !important; }
 
+        /* ==================================================================
+           REPORT FORMS – SHARED STYLES (English + Urdu)
+           ================================================================== */
+        .report-sheet {
+            width: 100%; max-width: 210mm; min-height: 297mm; max-height: 297mm;
+            background: #ffffff; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+            border: 1px solid #a0aab5; padding: 10mm 14mm 8mm 14mm;
+            margin: 0 auto 20px auto; position: relative; display: flex;
+            flex-direction: column; overflow: hidden;
+        }
+
+        .report-sheet h1 { font-size: 1.45rem; font-weight: 700; text-align: center; letter-spacing: 0.8px; text-transform: uppercase; color: #1e2b3a; border-bottom: 2.5px solid #1e3c72; padding-bottom: 4px; margin-bottom: 2px; line-height: 1.2; }
+        .report-sheet .subhead { text-align: center; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: #1e3c72; margin: 3px 0 1px; letter-spacing: 0.6px; }
+        .report-sheet .subhead2 { text-align: center; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: #2c3e50; margin-bottom: 4px; }
+        .report-sheet .instruction { text-align: center; font-style: italic; font-size: 0.78rem; font-weight: 600; color: #2e3b4e; border: 1px dashed #8fa0b5; padding: 3px 8px; background: #f6f9ff; border-radius: 3px; margin-bottom: 5px; }
+
+        .line-input { display: inline-block; border-bottom: 1.2px solid #2c3e50; vertical-align: middle; min-width: 80px; }
+        .line-input input { border: none; background: #fffdf2; padding: 1px 4px; font-family: 'Times New Roman', Times, serif; font-size: 0.92rem; color: #111; outline: none; width: 100%; min-width: 60px; transition: 0.12s; }
+        .line-input input:focus { background: #fff7d6; box-shadow: 0 1px 3px rgba(30, 60, 114, 0.18); }
+        .line-input input::placeholder { color: #8f9aaa; font-style: italic; font-size: 0.78rem; }
+
+        .report-sheet .row { margin: 5px 0; font-size: 0.92rem; line-height: 1.55; color: #1e2b3a; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 4px; }
+        .report-sheet .row strong { font-weight: 700; white-space: nowrap; }
+
+        .gap-sm { min-width: 60px; } .gap-md { min-width: 150px; } .gap-lg { min-width: 280px; } .gap-xl { min-width: 400px; }
+
+        .sig-block { display: flex; justify-content: flex-end; margin: 8px 0 6px; }
+        .sig-box { border-top: 1.8px solid #1e3c72; padding-top: 4px; min-width: 280px; max-width: 340px; text-align: center; font-weight: 700; font-size: 0.85rem; color: #1e2b3a; line-height: 1.4; }
+        .sig-box input { border: none; border-bottom: 1px solid #8a9aaa; background: #fffdf5; padding: 2px 4px; font-family: 'Times New Roman', Times, serif; font-size: 0.85rem; text-align: center; width: 100%; margin-top: 3px; outline: none; }
+        .sig-box input:focus { background: #fff7d6; }
+        .sig-box .sub { font-weight: 400; font-size: 0.78rem; color: #2e4058; display: block; margin-top: 1px; }
+
+        .office-block { background: #f3f7fd; border: 1px solid #b4c5d9; border-radius: 5px; padding: 5px 10px; margin: 6px 0 5px; font-size: 0.9rem; }
+        .office-block .row { margin: 2px 0; }
+
+        .dept-list { padding-left: 22px; margin: 3px 0 5px; font-size: 0.88rem; font-weight: 600; line-height: 1.6; color: #1e2b3a; }
+        .dept-list li { margin-bottom: 1px; }
+
+        .report-sheet .footnote { text-align: center; font-size: 0.7rem; color: #7a8a9e; margin-top: auto; padding-top: 4px; border-top: 1px dotted #b0bccb; font-family: 'Segoe UI', Arial, sans-serif; letter-spacing: 0.3px; }
+
+        .final-sig { display: flex; justify-content: flex-end; margin-top: 6px; }
+        .final-sig .sig-box { min-width: 230px; max-width: 280px; }
+
+        /* ==================================================================
+           URDU REPORT STYLES
+           ================================================================== */
+        .urdu-sheet { direction: rtl; font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Arial', sans-serif; font-size: 0.98rem; line-height: 2.1; color: #1e2b3a; }
+        .urdu-sheet .header-line { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.92rem; margin-bottom: 2px; border-bottom: 1px solid #888; padding-bottom: 4px; }
+        .urdu-sheet .title-main { text-align: center; font-size: 1.6rem; font-weight: 700; margin: 8px 0 6px; letter-spacing: 1px; }
+        .urdu-sheet .field-row { display: flex; align-items: baseline; gap: 2px 6px; flex-wrap: wrap; margin: 2px 0; }
+        .urdu-sheet .field-row .num { font-weight: 700; min-width: 18px; text-align: left; font-size: 0.9rem; }
+        .urdu-sheet .field-row .label { font-weight: 700; white-space: nowrap; }
+        .urdu-sheet .line-input { border-bottom: 1px dotted #333; min-width: 100px; flex: 1 1 auto; }
+        .urdu-sheet .line-input input { font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', 'Arial', sans-serif; font-size: 0.92rem; background: #fffdf2; text-align: right; padding: 1px 4px; border: none; outline: none; width: 100%; min-width: 60px; }
+        .urdu-sheet .line-input input:focus { background: #fff7d6; }
+        .urdu-sheet .line-input input::placeholder { color: #8f9aaa; font-style: italic; font-size: 0.8rem; }
+        .urdu-sheet .divider { border-top: 1.5px solid #1e3c72; margin: 6px 0; }
+        .urdu-sheet .sig-area { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; font-size: 0.9rem; }
+        .urdu-sheet .sig-item { text-align: center; border-top: 1.5px solid #333; padding-top: 4px; min-width: 180px; font-weight: 700; }
+        .urdu-sheet .sig-item input { border: none; border-bottom: 1px solid #aaa; background: #fffdf5; padding: 2px; font-family: inherit; font-size: 0.9rem; text-align: center; width: 100%; margin-top: 2px; outline: none; }
+        .urdu-sheet .sig-item input:focus { background: #fff7d6; }
+        .urdu-sheet .footer-note { text-align: center; font-size: 0.8rem; margin-top: 12px; font-weight: 700; color: #1e2b3a; }
+        .urdu-sheet .list-dept { list-style: none; padding-right: 24px; margin: 3px 0; font-size: 0.88rem; font-weight: 600; line-height: 1.9; }
+        .urdu-sheet .list-dept li::before { content: "⬤  "; font-size: 0.65rem; color: #1e3c72; vertical-align: middle; }
+
+        /* ==================================================================
+           TAB VISIBILITY
+           ================================================================== */
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* ==================================================================
+           REPORT-SPECIFIC PRINT BUTTONS
+           ================================================================== */
+        .report-print-bar {
+            max-width: 210mm;
+            margin: 0 auto 10px auto;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .report-print-bar .print-btn {
+            background-color: #1e3c72;
+            color: #fff;
+            border: none;
+            border-radius: 36px;
+            padding: 11px 26px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: 0.2s;
+            letter-spacing: 0.4px;
+            width: auto;
+            margin-top: 0;
+        }
+        .report-print-bar .print-btn:hover {
+            background-color: #0f2a4f;
+            transform: scale(1.02);
+        }
+
+        /* ==================================================================
+           PRINT STYLES (NO BLANK PAGES)
+           ================================================================== */
         @media print {
-            @page { size: A4 portrait; margin: 0; }
-            body { background: none; padding: 0; margin: 0; }
-            .no-print { display: none !important; }
-
-            body.print-certificates .panel-section,
-            body.print-certificates #application-report,
-            body.print-certificates #synopsis-report,
-            body.print-certificates #comparison-report,
-            body.print-certificates .tab-bar { display: none !important; }
-
-            body.print-application .certificate-page,
-            body.print-application #certificate-controls,
-            body.print-application #synopsis-controls,
-            body.print-application #synopsis-report,
-            body.print-application #comparison-controls,
-            body.print-application #comparison-report,
-            body.print-application .tab-bar { display: none !important; }
-
-            body.print-application #application-report {
-                display: block !important; width: 210mm; min-height: 297mm; max-width: none;
-                margin: 0 !important; padding: 15mm 20mm; box-shadow: none !important;
-                page-break-after: avoid; page-break-inside: avoid;
+            @page { 
+                size: A4 portrait; 
+                margin: 0mm; 
+            }
+            html, body { 
+                background: #fff !important; 
+                padding: 0 !important; 
+                margin: 0 !important; 
+                width: 210mm;
+                height: 100%;
             }
 
-            body.print-synopsis .certificate-page,
-            body.print-synopsis #certificate-controls,
-            body.print-synopsis #application-controls,
-            body.print-synopsis #application-report,
-            body.print-synopsis #comparison-controls,
-            body.print-synopsis #comparison-report,
-            body.print-synopsis .tab-bar { display: none !important; }
+            /* Hide ALL interactive/UI elements */
+            .tab-bar, .no-print, .print-btn, .add-row-btn, .backup-btn, .restore-btn,
+            .report-print-bar, .panel-section, .tab-separator { display: none !important; }
 
-            body.print-synopsis #synopsis-report {
-                display: block !important; width: 210mm !important; min-height: 297mm; max-width: none;
-                margin: 0 !important; padding: 15mm 20mm 22mm 20mm !important;
-                box-shadow: none !important;
+            /* Hide non-active containers */
+            .tab-pane { display: none !important; }
+            .certificate-page, .application-page, .synopsis-report, .comparison-report,
+            .report-sheet { display: none !important; }
+
+            /* Show only the active tab's print-target */
+            .tab-pane.active { display: block !important; }
+
+            /* Certificate pages specifically */
+            .tab-pane.active .certificate-page { 
+                display: block !important; 
+                box-shadow: none !important; 
+                margin: 0 !important; 
+                width: 210mm !important; 
+                height: 297mm !important; 
+                max-height: 297mm !important; 
+                padding: 15mm 20mm !important; 
+                page-break-after: always !important; 
+                break-after: page !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+            }
+            .tab-pane.active .certificate-page:last-of-type { 
+                page-break-after: avoid !important; 
+                break-after: avoid !important; 
             }
 
-            body.print-comparison .certificate-page,
-            body.print-comparison #certificate-controls,
-            body.print-comparison #application-controls,
-            body.print-comparison #application-report,
-            body.print-comparison #synopsis-controls,
-            body.print-comparison #synopsis-report,
-            body.print-comparison .tab-bar { display: none !important; }
-
-            body.print-comparison #comparison-report {
-                display: block !important; width: 210mm; min-height: 297mm; max-width: none;
-                margin: 0 !important; padding: 15mm 20mm; box-shadow: none !important;
-                page-break-after: avoid; page-break-inside: avoid;
+            /* Single Page Reports (Application, Synopsis, Comparison, Charge Reports) */
+            .tab-pane.active .application-page,
+            .tab-pane.active .synopsis-report,
+            .tab-pane.active .comparison-report { 
+                display: block !important; 
+                width: 210mm !important; 
+                height: 297mm !important; 
+                max-height: 297mm !important; 
+                margin: 0 !important; 
+                padding: 15mm 20mm !important; 
+                box-shadow: none !important; 
+                page-break-after: avoid !important; 
+                break-after: avoid !important; 
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
             }
 
-            .certificate-page {
-                box-shadow: none; margin: 0; width: 210mm; min-height: 297mm;
-                max-width: none; padding: 15mm 20mm; page-break-after: always;
-                page-break-inside: avoid;
+            /* Gazetted & Non-Gazetted Charge Reports */
+            .tab-pane.active .report-sheet { 
+                display: flex !important; 
+                box-shadow: none !important; 
+                border: none !important; 
+                padding: 10mm 14mm 8mm 14mm !important; 
+                width: 210mm !important; 
+                height: 297mm !important; 
+                max-height: 297mm !important; 
+                margin: 0 !important; 
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
             }
-            .certificate-page:last-of-type { page-break-after: auto; }
+
+            /* Clean up input borders and backgrounds for print */
+            input { background: transparent !important; border-bottom: 1px solid #333 !important; box-shadow: none !important; }
+            .office-block { background: #f8f8f8; border: 1px solid #999; }
+            .instruction { background: transparent; border: 1px dashed #666; }
+            .report-sheet .footnote { border-top: 1px dotted #999; color: #555; }
+            .line-input input::placeholder, .sig-box input::placeholder, .urdu-sheet .line-input input::placeholder, .urdu-sheet .sig-item input::placeholder { color: transparent !important; }
         }
     </style>
 </head>
 <body>
 
+    <!-- ================================================================
+         TAB BAR
+         ================================================================ -->
     <div class="tab-bar no-print" role="tablist">
-        <button type="button" class="tab-button active" id="tab-certificates" onclick="switchTab('certificates')">Promotion Certificates</button>
-        <button type="button" class="tab-button" id="tab-application" onclick="switchTab('application')">Application Form</button>
-        <button type="button" class="tab-button" id="tab-synopsis" onclick="switchTab('synopsis')">Synopsis Report</button>
-        <button type="button" class="tab-button" id="tab-comparison" onclick="switchTab('comparison')">Result Comparison & Backup</button>
+        <button type="button" class="tab-button active" id="tab-certificates" onclick="switchTab('certificates')">📄 Promotion Certificates</button>
+        <button type="button" class="tab-button" id="tab-application" onclick="switchTab('application')">📝 Application Form</button>
+        <button type="button" class="tab-button" id="tab-synopsis" onclick="switchTab('synopsis')">📊 Synopsis Report</button>
+        <button type="button" class="tab-button" id="tab-comparison" onclick="switchTab('comparison')">📈 Result Comparison</button>
+        <div class="tab-separator"></div>
+        <button type="button" class="tab-button" id="tab-gazetted" onclick="switchTab('gazetted')">🏛️ Gazetted Charge Report</button>
+        <button type="button" class="tab-button" id="tab-non-gazetted" onclick="switchTab('non-gazetted')">📋 Non-Gazetted (Urdu)</button>
     </div>
 
-    <!-- GLOBAL & CERTIFICATE DATA INPUT PANEL -->
-    <div class="no-print" id="certificate-controls">
-        <h3>Promotion Dossier Global Data Input</h3>
-        <p style="font-size: 12px; color: #666; margin-top:0;">Fill in your details below. Updates automatically across all certificates, application form, and reports.</p>
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Employee Name:</label>
-                <input type="text" id="input-name" value="MUHAMMAD SHAHID" oninput="syncData()">
+    <!-- ================================================================
+         TAB 1: PROMOTION CERTIFICATES (Dossier)
+         ================================================================ -->
+    <div id="pane-certificates" class="tab-pane active">
+        <div class="no-print panel-section" id="certificate-controls" style="display: block;">
+            <h3 style="margin-top:0; color:#1a365d; font-size:18px;">Promotion Dossier Global Data Input</h3>
+            <p style="font-size: 12px; color: #666; margin-top:0;">Fill in your details below. Updates automatically across all certificates, application form, and reports.</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Employee Name:</label>
+                    <input type="text" id="input-name" value="MUHAMMAD SHAHID" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Father's Name (Parentage):</label>
+                    <input type="text" id="input-father" value="MUHAMMAD IBRAHIM" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth:</label>
+                    <input type="date" id="input-dob" value="1971-01-13" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Date of Appointment:</label>
+                    <input type="date" id="input-doappt" value="1989-06-21" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Date of Entry into Present Scale:</label>
+                    <input type="date" id="input-dopresent" value="1989-06-21" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Designation / Post:</label>
+                    <input type="text" id="input-designation" value="SST (Computer Science)" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>BPS Scale:</label>
+                    <input type="text" id="input-bps" value="16" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>CNIC Number:</label>
+                    <input type="text" id="input-cnic" value="36302-1234567-1" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Qualification:</label>
+                    <input type="text" id="input-qualification" value="M.Sc Computer Science" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Head Title (Signatory Designation):</label>
+                    <select id="input-head-title" onchange="onHeadTitleChange()">
+                        <option value="HEADMASTER" selected>HEADMASTER</option>
+                        <option value="HEADMISTRESS">HEADMISTRESS</option>
+                        <option value="PRINCIPAL">PRINCIPAL</option>
+                        <option value="SENIOR HEADMASTER">SENIOR HEADMASTER</option>
+                        <option value="SENIOR HEADMISTRESS">SENIOR HEADMISTRESS</option>
+                        <option value="AEO">AEO</option>
+                        <option value="DEPUTY DEO (MALE)">DEPUTY DEO (MALE)</option>
+                        <option value="DEPUTY DEO (FEMALE)">DEPUTY DEO (FEMALE)</option>
+                        <option value="DEO (SE)">DEO (SE)</option>
+                        <option value="DEO (E/MALE)">DEO (E/MALE)</option>
+                        <option value="DEO (E/FEMALE)">DEO (E/FEMALE)</option>
+                        <option value="CEO">CEO</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Office Header Title:</label>
+                    <select id="input-office-title" onchange="syncData()">
+                        <option value="Office of the Headmaster" selected>Office of the Headmaster</option>
+                        <option value="Office of the Headmistress">Office of the Headmistress</option>
+                        <option value="Office of the Principal">Office of the Principal</option>
+                        <option value="Office of the Senior Headmaster">Office of the Senior Headmaster</option>
+                        <option value="Office of the Senior Headmistress">Office of the Senior Headmistress</option>
+                        <option value="Office of the AEO">Office of the AEO</option>
+                        <option value="Office of the Deputy DEO (Male)">Office of the Deputy DEO (Male)</option>
+                        <option value="Office of the Deputy DEO (Female)">Office of the Deputy DEO (Female)</option>
+                        <option value="Office of the DEO (SE)">Office of the DEO (SE)</option>
+                        <option value="Office of the DEO (E/Male)">Office of the DEO (E/Male)</option>
+                        <option value="Office of the DEO (E/Female)">Office of the DEO (E/Female)</option>
+                        <option value="Office of the CEO">Office of the CEO</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>School / Office Name:</label>
+                    <input type="text" id="input-school-name" value="Govt. High School 175/9-L" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Tehsil:</label>
+                    <input type="text" id="input-tehsil" value="Tehsil Chichawatni" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>District:</label>
+                    <input type="text" id="input-district" value="District Sahiwal" oninput="syncData()">
+                </div>
+                <div class="form-group full-width" style="margin-top: 10px; border-top: 1px solid #cbd5e1; padding-top: 10px;">
+                    <label>Global Data Backup & Restore:</label>
+                    <div style="display: flex; gap: 8px; margin-top: 5px;">
+                        <button type="button" class="backup-btn" style="margin:0; flex:1;" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
+                        <button type="button" class="restore-btn" style="margin:0; flex:1;" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
+                        <input type="file" id="restore-file" style="display: none;" accept=".json" onchange="restoreFromJson(event)">
+                    </div>
+                </div>
+                <button class="print-btn" onclick="printCertificates()">Print All Certificates (A4)</button>
             </div>
-            <div class="form-group">
-                <label>Father's Name (Parentage):</label>
-                <input type="text" id="input-father" value="MUHAMMAD IBRAHIM" oninput="syncData()">
+        </div>
+
+        <!-- 1. NO INQUIRY CERTIFICATE -->
+        <div class="certificate-page print-target">
+            <div class="header-box">
+                <h2 class="sync-office-title">Office of the Headmaster</h2>
+                <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
             </div>
-            <!-- DATE PICKERS -->
-            <div class="form-group">
-                <label>Date of Birth:</label>
-                <input type="date" id="input-dob" value="1971-01-13" oninput="syncData()">
+            <div class="cert-title">No Inquiry / No Punishment Certificate</div>
+            <div class="cert-body">
+                <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+                <p style="margin-top: 10px;">
+                    It is certified that particulars of <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, Designation: <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>), CNIC No. <span class="sync-cnic">36302-1234567-1</span>, currently working at <strong class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></strong> are as under:
+                </p>
+                <ol>
+                    <li>Certify that no inquiry is pending against <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span> according to this office record.</li>
+                    <li>Has no audit paras, draft paras, or financial recovery pending against the employee.</li>
+                    <li>Certify that no Punishment was given to <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span> according to this office record.</li>
+                    <li>Has no judicial or court case pending against him in any court of law.</li>
+                </ol>
+                <p style="margin-top: 15px;">This certificate is issued for promotion dossier and official record upon his request.</p>
             </div>
-            <div class="form-group">
-                <label>Date of Appointment:</label>
-                <input type="date" id="input-doappt" value="1989-06-21" oninput="syncData()">
+            <div class="signature-section">
+                <p><span class="sync-head-title">HEADMASTER</span></p>
+                <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
             </div>
-            <div class="form-group">
-                <label>Date of Entry into Present Scale:</label>
-                <input type="date" id="input-dopresent" value="1989-06-21" oninput="syncData()">
+            <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
+        </div>
+
+        <!-- 2. NO DEMAND & NO AUDIT PARAS CERTIFICATE -->
+        <div class="certificate-page print-target">
+            <div class="header-box">
+                <h2 class="sync-office-title">Office of the Headmaster</h2>
+                <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
             </div>
-            <div class="form-group">
-                <label>Designation / Post:</label>
-                <input type="text" id="input-designation" value="SST (Computer Science)" oninput="syncData()">
+            <div class="cert-title">No Demand & No Audit Paras Certificate</div>
+            <div class="cert-body">
+                <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+                <p style="margin-top: 10px;">
+                    It is certified that as per available record of this institution, particulars of <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, Designation: <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>), at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span>:
+                </p>
+                <ol>
+                    <li><strong>NO DEMAND CERTIFICATE:</strong> Certify that nothing is outstanding against <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span> according to this office record.</li>
+                    <li><strong>NO AUDIT PARAS CERTIFICATE:</strong> Certify that no audit Paras is against <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span> according to this office record.</li>
+                </ol>
+                <p style="margin-top: 15px;">Further, no advance/loan recovery or overpayment is outstanding against the employee’s official account.</p>
             </div>
-            <div class="form-group">
-                <label>BPS Scale:</label>
-                <input type="text" id="input-bps" value="16" oninput="syncData()">
+            <div class="signature-section">
+                <p><span class="sync-head-title">HEADMASTER</span></p>
+                <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
             </div>
-            <div class="form-group">
-                <label>CNIC Number:</label>
-                <input type="text" id="input-cnic" value="36302-1234567-1" oninput="syncData()">
+            <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
+        </div>
+
+        <!-- 3. REGULAR SERVICE CERTIFICATE -->
+        <div class="certificate-page print-target">
+            <div class="header-box">
+                <h2 class="sync-office-title">Office of the Headmaster</h2>
+                <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
             </div>
-            <div class="form-group">
-                <label>Qualification:</label>
-                <input type="text" id="input-qualification" value="M.Sc Computer Science" oninput="syncData()">
+            <div class="cert-title">Regular Service & Verification Certificate</div>
+            <div class="cert-body">
+                <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+                <p style="margin-top: 10px;">
+                    It is certified that <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong> working at <strong class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></strong>, is a regular employee of the School Education Department, Government of the Punjab. The verified service details are as under:
+                </p>
+                <ul style="list-style-type: none; padding-left: 0; line-height: 1.8;">
+                    <li><strong>Designation &amp; Scale:</strong> <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>)</li>
+                    <li><strong>CNIC Number:</strong> <span class="sync-cnic">36302-1234567-1</span></li>
+                </ul>
+                <p style="margin-top: 10px;">The employee’s service record is clean, satisfactory, and continuous to date without any interruption or unauthorized absence.</p>
             </div>
-            <div class="form-group">
-                <label>Head Title (Signatory Designation):</label>
-                <select id="input-head-title" onchange="onHeadTitleChange()">
-                    <option value="HEADMASTER" selected>HEADMASTER</option>
-                    <option value="HEADMISTRESS">HEADMISTRESS</option>
-                    <option value="PRINCIPAL">PRINCIPAL</option>
-                    <option value="SENIOR HEADMASTER">SENIOR HEADMASTER</option>
-                    <option value="SENIOR HEADMISTRESS">SENIOR HEADMISTRESS</option>
-                    <option value="AEO">AEO</option>
-                    <option value="DEPUTY DEO (MALE)">DEPUTY DEO (MALE)</option>
-                    <option value="DEPUTY DEO (FEMALE)">DEPUTY DEO (FEMALE)</option>
-                    <option value="DEO (SE)">DEO (SE)</option>
-                    <option value="DEO (E/MALE)">DEO (E/MALE)</option>
-                    <option value="DEO (E/FEMALE)">DEO (E/FEMALE)</option>
-                    <option value="CEO">CEO</option>
-                </select>
+            <div class="signature-section">
+                <p><span class="sync-head-title">HEADMASTER</span></p>
+                <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
             </div>
-            <div class="form-group">
-                <label>Office Header Title:</label>
-                <select id="input-office-title" onchange="syncData()">
-                    <option value="Office of the Headmaster" selected>Office of the Headmaster</option>
-                    <option value="Office of the Headmistress">Office of the Headmistress</option>
-                    <option value="Office of the Principal">Office of the Principal</option>
-                    <option value="Office of the Senior Headmaster">Office of the Senior Headmaster</option>
-                    <option value="Office of the Senior Headmistress">Office of the Senior Headmistress</option>
-                    <option value="Office of the AEO">Office of the AEO</option>
-                    <option value="Office of the Deputy DEO (Male)">Office of the Deputy DEO (Male)</option>
-                    <option value="Office of the Deputy DEO (Female)">Office of the Deputy DEO (Female)</option>
-                    <option value="Office of the DEO (SE)">Office of the DEO (SE)</option>
-                    <option value="Office of the DEO (E/Male)">Office of the DEO (E/Male)</option>
-                    <option value="Office of the DEO (E/Female)">Office of the DEO (E/Female)</option>
-                    <option value="Office of the CEO">Office of the CEO</option>
-                </select>
+            <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
+        </div>
+
+        <!-- 4. NO LPR / NO OPTION CERTIFICATE -->
+        <div class="certificate-page print-target">
+            <div class="header-box">
+                <h2 class="sync-office-title">Office of the Headmaster</h2>
+                <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
             </div>
-            <div class="form-group full-width">
-                <label>School / Office Name:</label>
-                <input type="text" id="input-school-name" value="Govt. High School 175/9-L" oninput="syncData()">
+            <div class="cert-title">No LPR / No Option Certificate</div>
+            <div class="cert-body">
+                <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+                <p style="margin-top: 10px;">
+                    It is certified that <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, Designation: <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>), currently working at <strong class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></strong>:
+                </p>
+                <ol>
+                    <li>The employee has <strong>NOT</strong> applied for Leave Preparatory to Retirement (LPR).</li>
+                    <li>The employee has <strong>NOT</strong> opted for Premature or Voluntary Retirement.</li>
+                    <li>The employee is actively performing his official duties on a regular basis at this institution.</li>
+                    <li>The employee has no intention to proceed on LPR in the near future and will complete his full length of service.</li>
+                </ol>
+                <p style="margin-top: 15px;">This certificate is issued upon his request for the compilation of his promotion dossier.</p>
             </div>
-            <div class="form-group">
-                <label>Tehsil:</label>
-                <input type="text" id="input-tehsil" value="Tehsil Chichawatni" oninput="syncData()">
+            <div class="signature-section">
+                <p><span class="sync-head-title">HEADMASTER</span></p>
+                <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
             </div>
-            <div class="form-group">
-                <label>District:</label>
-                <input type="text" id="input-district" value="District Sahiwal" oninput="syncData()">
+            <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         TAB 2: APPLICATION FORM
+         ================================================================ -->
+    <div id="pane-application" class="tab-pane">
+        <section class="panel-section" id="application-controls" style="display: block;">
+            <h2>Cover Application Data Entry</h2>
+            <p style="font-size: 13px; color: #555;">Customize application reference details and target promotion rank for dossier submission.</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Dispatch / Outward No:</label>
+                    <input type="text" id="app-input-no" value="GHS/175-9L/2026/102" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Application Date:</label>
+                    <input type="date" id="app-input-date" value="2026-11-02" oninput="syncData()">
+                </div>
+                <div class="form-group full-width">
+                    <label>Recipient Title & Officer:</label>
+                    <input type="text" id="app-input-recipient" value="The District Education Officer (SE), Sahiwal" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>Promotion Target Rank:</label>
+                    <input type="text" id="app-input-target-rank" value="Headmaster (HM) / Subject Specialist (SS)" oninput="syncData()">
+                </div>
+                <div class="form-group">
+                    <label>EMIS Code (Optional):</label>
+                    <input type="text" id="app-input-emis" value="EMIS: 39120125" oninput="syncData()">
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <button type="button" class="print-btn" style="margin-top:0;" onclick="printApplication()">Print Application (A4)</button>
+            </div>
+        </section>
+
+        <section class="application-page print-target" id="application-report">
+            <div class="header-box">
+                <h2 class="sync-office-title">Office of the Headmaster</h2>
+                <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
+                <div style="font-size: 12px; font-weight: bold; margin-top: 3px;" id="out-app-emis">EMIS: 39120125</div>
             </div>
 
-            <div class="form-group full-width" style="margin-top: 10px; border-top: 1px solid #cbd5e1; padding-top: 10px;">
-                <label>Global Data Backup & Restore:</label>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <button type="button" class="backup-btn" style="margin:0; flex:1;" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
-                    <button type="button" class="restore-btn" style="margin:0; flex:1;" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
-                    <input type="file" id="restore-file" style="display: none;" accept=".json" onchange="restoreFromJson(event)">
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; margin-bottom: 20px;">
+                <div>NO. <span id="out-app-no">GHS/175-9L/2026/102</span></div>
+                <div>DATED: <span id="out-app-date">02-11-2026</span></div>
+            </div>
+
+            <div style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                To,<br>
+                <strong id="out-app-recipient">The District Education Officer (SE), Sahiwal</strong>
+            </div>
+
+            <div style="font-weight: bold; font-size: 14px; text-decoration: underline; margin: 15px 0;">
+                SUBJECT: <span style="text-transform: uppercase;">APPLICATION FOR SUBMISSION OF COMPLETE RECORD (CR) / DOSSIER FOR PROMOTION FROM <span class="sync-designation">SST (Computer Science)</span> TO <span id="out-app-target-rank">Headmaster (HM) / Subject Specialist (SS)</span></span>
+            </div>
+
+            <div style="font-size: 14px; text-align: justify; line-height: 1.8; margin-top: 15px;">
+                <p><strong>Respected Sir,</strong></p>
+                <p style="text-indent: 30px;">
+                    Most respectfully, it is submitted that I, <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, working as <strong><span class="sync-designation">SST (Computer Science)</span></strong> at <strong><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-district">District Sahiwal</span></strong>. I am submitting my complete record (CR) / dossier for consideration of promotion to the rank of <strong><span id="out-app-target-rank-body">Headmaster (HM) / Subject Specialist (SS)</span></strong>.
+                </p>
+                <p style="text-indent: 30px;">
+                    All the required documents, performance reports, ACR synopses, and certificates as prescribed in the departmental promotion checklist have been meticulously compiled and attached herewith for official verification and proceedings.
+                </p>
+                <p style="text-indent: 30px;">
+                    It is requested that my dossier may kindly be accepted and forwarded to the concerned Departmental Promotion Committee (DPC) for further necessary proceedings.
+                </p>
+                <p style="margin-top: 20px;">Thanking you in anticipation.</p>
+            </div>
+
+            <div class="signature-section" style="bottom: 30mm;">
+                <p style="margin-top: 40px;">_________________________</p>
+                <p><strong><span class="sync-name">MUHAMMAD SHAHID</span></strong></p>
+                <p><span class="sync-designation">SST (Computer Science)</span></p>
+                <p>CNIC: <span class="sync-cnic">36302-1234567-1</span></p>
+                <p><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-district">District Sahiwal</span></p>
+            </div>
+
+            <div class="brand-footer">
+                <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+            </div>
+        </section>
+    </div>
+
+    <!-- ================================================================
+         TAB 3: SYNOPSIS REPORT
+         ================================================================ -->
+    <div id="pane-synopsis" class="tab-pane">
+        <section class="panel-section" id="synopsis-controls" style="display: block;">
+            <h2>Synopsis Character Roll Data Entry & Backup</h2>
+            <p style="font-size: 13px; color: #555;">Add, remove, or edit ACR service period rows below just like the comparison table. Changes reflect instantly on the printable synopsis report.</p>
+
+            <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
+                <button type="button" class="add-row-btn" onclick="addSynopsisRow()">+ Add Service Period Row</button>
+                <button type="button" class="backup-btn" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
+                <button type="button" class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
+            </div>
+
+            <div class="table-scroll">
+                <table class="synopsis-input-table">
+                    <thead>
+                        <tr>
+                            <th>Period (From - To)</th>
+                            <th>Post Held</th>
+                            <th>Integrity</th>
+                            <th>General Assessment</th>
+                            <th>General Remarks</th>
+                            <th>Adverse Remarks</th>
+                            <th>Fit For Promotion</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="synopsis-input-tbody"></tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button type="button" class="print-btn" style="margin-top:0;" onclick="printSynopsis()">Print Synopsis Report (A4)</button>
+            </div>
+        </section>
+
+        <section class="synopsis-report print-target" id="synopsis-report">
+            <div style="text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 15px;">
+                SYNOPSIS OF CHARACTER ROLL IN RESPECT OF<br>
+                MR. <span class="sync-name">MUHAMMAD SHAHID</span> (<span class="sync-designation">SST CS</span>)<br>
+                O/O <span class="sync-head-title">HEADMASTER</span> <span class="sync-school-name">GOVT. HIGH SCHOOL 175/9-L</span>, <span class="sync-district">DISTRICT SAHIWAL</span>
+            </div>
+
+            <table class="bio-table">
+                <tbody>
+                    <tr>
+                        <td class="bio-label">Name with Parentage</td>
+                        <td class="bio-value"><strong><span class="sync-name">MUHAMMAD SHAHID</span> S/O <span class="sync-father">MUHAMMAD IBRAHIM</span></strong></td>
+                    </tr>
+                    <tr>
+                        <td class="bio-label">CNIC</td>
+                        <td class="bio-value"><strong><span class="sync-cnic">36302-1234567-1</span></strong></td>
+                    </tr>
+                    <tr>
+                        <td class="bio-label">Date of Birth</td>
+                        <td class="bio-value"><strong><span class="sync-dob">13-01-1971</span></strong></td>
+                    </tr>
+                    <tr>
+                        <td class="bio-label">Qualification</td>
+                        <td class="bio-value"><strong><span class="sync-qualification">M.Sc Computer Science</span></strong></td>
+                    </tr>
+                    <tr>
+                        <td class="bio-label">Date of Appointment</td>
+                        <td class="bio-value"><strong><span class="sync-doappt">21-06-1989</span></strong></td>
+                    </tr>
+                    <tr>
+                        <td class="bio-label">Date of Entry into Present Scale</td>
+                        <td class="bio-value"><strong><span class="sync-dopresent">21-06-1989</span></strong></td>
+                    </tr>
+                    <tr>
+                        <td class="bio-label">Present Post / Designation</td>
+                        <td class="bio-value"><strong><span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>)</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="bio-label">School / Office</td>
+                        <td class="bio-value"><strong><span class="sync-school-name">Govt. High School 175/9-L</span>, <span class="sync-tehsil">Tehsil Chichawatni</span>, <span class="sync-district">District Sahiwal</span></strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="synopsis-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Period</th>
+                        <th style="width: 8%;">Post Held</th>
+                        <th style="width: 10%;">Integrity</th>
+                        <th style="width: 10%;">General Assessment</th>
+                        <th style="width: 32%;">General Remarks</th>
+                        <th style="width: 10%;">Adverse Remarks</th>
+                        <th style="width: 15%;">Fit For Promotion</th>
+                    </tr>
+                </thead>
+                <tbody id="synopsis-report-tbody"></tbody>
+            </table>
+
+            <div style="font-size: 12px; margin-top: 15px; line-height: 1.6;">
+                1. Certified that there are no adverse remarks in the enclosed synopsis of ACR(s).<br>
+                2. Certified that the above said official was neither previously retired nor reinstated in service.<br>
+                3. Certified that the synopsis of the ACR(s) of the official is in accordance with the character roll and is correct.<br>
+                4. Certified that neither any Enquiry/ Disciplinary case pending against him, nor he was inflicted any punishment.
+            </div>
+
+            <div style="margin-top: 35px; display: flex; justify-content: flex-end;">
+                <div style="text-align: center; min-width: 220px; font-size: 13px;">
+                    <strong>Signature &amp; Stamp of<br>Reporting Officer</strong>
                 </div>
             </div>
 
-            <button class="print-btn" onclick="printCertificates()">Print All Certificates (A4)</button>
-        </div>
+            <div style="margin-top: 25px; font-size: 13px; font-weight: bold;">
+                Countersignature of District Education Officer (SE)
+            </div>
+
+            <div class="brand-footer">
+                <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+            </div>
+        </section>
     </div>
 
-    <!-- APPLICATION CONTROL PANEL -->
-    <section class="panel-section no-print" id="application-controls">
-        <h2>Cover Application Data Entry</h2>
-        <p style="font-size: 13px; color: #555;">Customize application reference details and target promotion rank for dossier submission.</p>
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Dispatch / Outward No:</label>
-                <input type="text" id="app-input-no" value="GHS/175-9L/2026/102" oninput="syncData()">
+    <!-- ================================================================
+         TAB 4: RESULT COMPARISON
+         ================================================================ -->
+    <div id="pane-comparison" class="tab-pane">
+        <section class="panel-section" id="comparison-controls" style="display: block;">
+            <h2>Result Comparison Data Entry & Backup</h2>
+            <p style="font-size: 13px; color: #555;">Manage rows and use JSON Backup & Restore to secure or load all your records instantly.</p>
+
+            <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
+                <button type="button" class="add-row-btn" onclick="addYearRow()">+ Add Year</button>
+                <button type="button" class="backup-btn" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
+                <button type="button" class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
             </div>
-            <div class="form-group">
-                <label>Application Date:</label>
-                <input type="date" id="app-input-date" value="2026-11-02" oninput="syncData()">
-            </div>
-            <div class="form-group full-width">
-                <label>Recipient Title & Officer:</label>
-                <input type="text" id="app-input-recipient" value="The District Education Officer (SE), Sahiwal" oninput="syncData()">
-            </div>
-            <div class="form-group">
-                <label>Promotion Target Rank:</label>
-                <input type="text" id="app-input-target-rank" value="Headmaster (HM) / Subject Specialist (SS)" oninput="syncData()">
-            </div>
-            <div class="form-group">
-                <label>EMIS Code (Optional):</label>
-                <input type="text" id="app-input-emis" value="EMIS: 39120125" oninput="syncData()">
-            </div>
-        </div>
-        <div style="margin-top: 15px;">
-            <button type="button" class="print-btn" style="margin-top:0;" onclick="printApplication()">Print Application (A4)</button>
-        </div>
-    </section>
 
-    <!-- PRINTABLE COVER APPLICATION PAGE -->
-    <section class="application-page" id="application-report" style="display:none;">
-        <div class="header-box">
-            <h2 class="sync-office-title">Office of the Headmaster</h2>
-            <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
-            <div style="font-size: 12px; font-weight: bold; margin-top: 3px;" id="out-app-emis">EMIS: 39120125</div>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; margin-bottom: 20px;">
-            <div>NO. <span id="out-app-no">GHS/175-9L/2026/102</span></div>
-            <div>DATED: <span id="out-app-date">02-11-2026</span></div>
-        </div>
-
-        <div style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
-            To,<br>
-            <strong id="out-app-recipient">The District Education Officer (SE), Sahiwal</strong>
-        </div>
-
-        <div style="font-weight: bold; font-size: 14px; text-decoration: underline; margin: 15px 0;">
-            SUBJECT: <span style="text-transform: uppercase;">APPLICATION FOR SUBMISSION OF COMPLETE RECORD (CR) / DOSSIER FOR PROMOTION FROM <span class="sync-designation">SST (Computer Science)</span> TO <span id="out-app-target-rank">Headmaster (HM) / Subject Specialist (SS)</span></span>
-        </div>
-
-        <div style="font-size: 14px; text-align: justify; line-height: 1.8; margin-top: 15px;">
-            <p><strong>Respected Sir,</strong></p>
-            <p style="text-indent: 30px;">
-                Most respectfully, it is submitted that I, <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, working as <strong><span class="sync-designation">SST (Computer Science)</span></strong> at <strong><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-district">District Sahiwal</span></strong>. I am submitting my complete record (CR) / dossier for consideration of promotion to the rank of <strong><span id="out-app-target-rank-body">Headmaster (HM) / Subject Specialist (SS)</span></strong>.
-            </p>
-            <p style="text-indent: 30px;">
-                All the required documents, performance reports, ACR synopses, and certificates as prescribed in the departmental promotion checklist have been meticulously compiled and attached herewith for official verification and proceedings.
-            </p>
-            <p style="text-indent: 30px;">
-                It is requested that my dossier may kindly be accepted and forwarded to the concerned Departmental Promotion Committee (DPC) for further necessary proceedings.
-            </p>
-            <p style="margin-top: 20px;">Thanking you in anticipation.</p>
-        </div>
-
-        <div class="signature-section" style="bottom: 30mm;">
-            <p style="margin-top: 40px;">_________________________</p>
-            <p><strong><span class="sync-name">MUHAMMAD SHAHID</span></strong></p>
-            <p><span class="sync-designation">SST (Computer Science)</span></p>
-            <p>CNIC: <span class="sync-cnic">36302-1234567-1</span></p>
-            <p><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-district">District Sahiwal</span></p>
-        </div>
-
-        <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
-        </div>
-    </section>
-
-    <!-- SYNOPSIS INPUT PANEL -->
-    <section class="panel-section no-print" id="synopsis-controls">
-        <h2>Synopsis Character Roll Data Entry & Backup</h2>
-        <p style="font-size: 13px; color: #555;">Add, remove, or edit ACR service period rows below just like the comparison table. Changes reflect instantly on the printable synopsis report.</p>
-
-        <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
-            <button type="button" class="add-row-btn" onclick="addSynopsisRow()">+ Add Service Period Row</button>
-            <button type="button" class="backup-btn" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
-            <button type="button" class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
-        </div>
-
-        <div class="table-scroll">
-            <table class="synopsis-input-table">
+            <table class="comparison-table-input">
                 <thead>
                     <tr>
-                        <th>Period (From - To)</th>
-                        <th>Post Held</th>
-                        <th>Integrity</th>
-                        <th>General Assessment</th>
-                        <th>General Remarks</th>
-                        <th>Adverse Remarks</th>
-                        <th>Fit For Promotion</th>
+                        <th>Year</th>
+                        <th>Subject / Class</th>
+                        <th>Appeared</th>
+                        <th>Passed</th>
+                        <th>Failed (Auto)</th>
+                        <th>School % (Auto)</th>
+                        <th>Board % (Manual)</th>
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="synopsis-input-tbody"></tbody>
+                <tbody id="input-table-body"></tbody>
             </table>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button type="button" class="print-btn" style="margin-top:0;" onclick="printComparison()">Print Report (A4)</button>
+            </div>
+        </section>
+
+        <section class="comparison-report print-target" id="comparison-report">
+            <h2>RESULT COMPARISON REPORT</h2>
+            <h3 id="out-report-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
+            <div class="report-meta">Comparison of Annual Examination Results</div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Subject / Class</th>
+                        <th>Appeared</th>
+                        <th>Passed</th>
+                        <th>Failed</th>
+                        <th>School Pass %</th>
+                        <th>Board Pass %</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="report-table-body"></tbody>
+            </table>
+
+            <p style="font-size: 13px; margin-top: 20px;">This comparative statement reflects the academic performance and standard of instruction maintained at the institution over consecutive years in comparison with the BISE results.</p>
+
+            <div style="margin-top:40px; display:flex; justify-content:space-between; gap:30px;">
+                <div style="text-align:center; min-width:190px; font-size:13px;">_________________________<br>Prepared By</div>
+                <div style="text-align:center; min-width:190px; font-size:13px;"><span class="sync-head-title">HEADMASTER</span><br><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></div>
+            </div>
+
+            <div class="brand-footer">
+                <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
+            </div>
+        </section>
+    </div>
+
+    <!-- ================================================================
+         TAB 5: GAZETTED CHARGE REPORT (English)
+         ================================================================ -->
+    <div id="pane-gazetted" class="tab-pane">
+        <div class="report-print-bar no-print">
+            <button class="print-btn" onclick="printGazetted()">🖨️ Print Gazetted Charge Report</button>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button type="button" class="print-btn" style="margin-top:0;" onclick="printSynopsis()">Print Synopsis Report (A4)</button>
-        </div>
-    </section>
+        <div class="report-sheet print-target">
+            <h1>EDUCATION DEPARTMENT</h1>
+            <div class="subhead">CHARGE REPORT FORM FOR GAZETTED OFFICERS</div>
+            <div class="subhead2">(For all charges among Gazetted Government Servants)</div>
+            <div class="instruction">
+                ⚡ All these certificates should be at once filled up and dispatched by the same date.
+            </div>
 
-    <!-- SYNOPSIS PRINTABLE REPORT (now with bio-data table) -->
-    <section class="synopsis-report" id="synopsis-report" style="display:none;">
-        <div style="text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 15px;">
-            SYNOPSIS OF CHARACTER ROLL IN RESPECT OF<br>
-            MR. <span class="sync-name">MUHAMMAD SHAHID</span> (<span class="sync-designation">SST CS</span>)<br>
-            O/O <span class="sync-head-title">HEADMASTER</span> <span class="sync-school-name">GOVT. HIGH SCHOOL 175/9-L</span>, <span class="sync-district">DISTRICT SAHIWAL</span>
-        </div>
+            <div class="row" style="margin-top:8px;">
+                <strong>Certified that I</strong>
+                <span class="line-input gap-xl">
+                    <input type="text" placeholder="full name of officer" style="min-width:380px;">
+                </span>
+                <strong>have this day</strong>
+            </div>
 
-        <!-- BIO-DATA TABLE (replaces old text block) -->
-        <table class="bio-table">
-            <tbody>
-                <tr>
-                    <td class="bio-label">Name with Parentage</td>
-                    <td class="bio-value"><strong><span class="sync-name">MUHAMMAD SHAHID</span> S/O <span class="sync-father">MUHAMMAD IBRAHIM</span></strong></td>
-                </tr>
-                <tr>
-                    <td class="bio-label">CNIC</td>
-                    <td class="bio-value"><strong><span class="sync-cnic">36302-1234567-1</span></strong></td>
-                </tr>
-                <tr>
-                    <td class="bio-label">Date of Birth</td>
-                    <td class="bio-value"><strong><span class="sync-dob">13-01-1971</span></strong></td>
-                </tr>
-                <tr>
-                    <td class="bio-label">Qualification</td>
-                    <td class="bio-value"><strong><span class="sync-qualification">M.Sc Computer Science</span></strong></td>
-                </tr>
-                <tr>
-                    <td class="bio-label">Date of Appointment</td>
-                    <td class="bio-value"><strong><span class="sync-doappt">21-06-1989</span></strong></td>
-                </tr>
-                <tr>
-                    <td class="bio-label">Date of Entry into Present Scale</td>
-                    <td class="bio-value"><strong><span class="sync-dopresent">21-06-1989</span></strong></td>
-                </tr>
-                <tr>
-                    <td class="bio-label">Present Post / Designation</td>
-                    <td class="bio-value"><strong><span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>)</strong></td>
-                </tr>
-                <tr>
-                    <td class="bio-label">School / Office</td>
-                    <td class="bio-value"><strong><span class="sync-school-name">Govt. High School 175/9-L</span>, <span class="sync-tehsil">Tehsil Chichawatni</span>, <span class="sync-district">District Sahiwal</span></strong></td>
-                </tr>
-            </tbody>
-        </table>
+            <div class="row">
+                <span class="line-input gap-md">
+                    <input type="text" placeholder="fore noon / after noon" style="min-width:170px;">
+                </span>
+                <strong>after noon / fore noon taken over / made over</strong>
+            </div>
+            <div class="row">
+                <strong>the charge of the</strong>
+                <span class="line-input gap-xl">
+                    <input type="text" placeholder="designation / office / department" style="min-width:380px;">
+                </span>
+            </div>
 
-        <table class="synopsis-table">
-            <thead>
-                <tr>
-                    <th style="width: 15%;">Period</th>
-                    <th style="width: 8%;">Post Held</th>
-                    <th style="width: 10%;">Integrity</th>
-                    <th style="width: 10%;">General Assessment</th>
-                    <th style="width: 32%;">General Remarks</th>
-                    <th style="width: 10%;">Adverse Remarks</th>
-                    <th style="width: 15%;">Fit For Promotion</th>
-                </tr>
-            </thead>
-            <tbody id="synopsis-report-tbody"></tbody>
-        </table>
+            <div class="row">
+                <strong>both officers being present with reference to the order of the</strong>
+                <span class="line-input" style="min-width:480px;">
+                    <input type="text" placeholder="order reference / description" style="min-width:440px;">
+                </span>
+            </div>
+            <div class="row" style="margin-bottom:4px;">
+                <strong>No.</strong>
+                <span class="line-input gap-sm">
+                    <input type="text" placeholder="No." style="min-width:80px;">
+                </span>
+                <strong>Dated:</strong>
+                <span class="line-input gap-md">
+                    <input type="text" placeholder="date" style="min-width:140px;">
+                </span>
+                <strong>transferring from</strong>
+                <span class="line-input" style="min-width:200px;">
+                    <input type="text" placeholder="from office" style="min-width:180px;">
+                </span>
+                <strong>to</strong>
+                <span class="line-input" style="min-width:200px;">
+                    <input type="text" placeholder="to office" style="min-width:180px;">
+                </span>
+            </div>
 
-        <div style="font-size: 12px; margin-top: 15px; line-height: 1.6;">
-            1. Certified that there are no adverse remarks in the enclosed synopsis of ACR(s).<br>
-            2. Certified that the above said official was neither previously retired nor reinstated in service.<br>
-            3. Certified that the synopsis of the ACR(s) of the official is in accordance with the character roll and is correct.<br>
-            4. Certified that neither any Enquiry/ Disciplinary case pending against him, nor he was inflicted any punishment.
-        </div>
+            <div class="sig-block">
+                <div class="sig-box">
+                    Signature of the Govt. Servant
+                    <span class="sub">(taking over / making over the charge)</span>
+                    <input type="text" placeholder="signature">
+                </div>
+            </div>
 
-        <div style="margin-top: 35px; display: flex; justify-content: flex-end;">
-            <div style="text-align: center; min-width: 220px; font-size: 13px;">
-                <strong>Signature &amp; Stamp of<br>Reporting Officer</strong>
+            <div class="office-block">
+                <div class="row" style="font-weight:700; font-size:0.95rem; margin-bottom:2px;">
+                    OFFICE OF THE GOVERNMENT
+                </div>
+                <div class="row" style="gap:6px;">
+                    <span class="line-input" style="min-width:260px;">
+                        <input type="text" placeholder="office name / address" style="min-width:240px;">
+                    </span>
+                    <strong>Enc No.</strong>
+                    <span class="line-input" style="min-width:100px;">
+                        <input type="text" placeholder="Enc. No." style="min-width:80px;">
+                    </span>
+                    <strong>Dated:</strong>
+                    <span class="line-input" style="min-width:130px;">
+                        <input type="text" placeholder="date" style="min-width:110px;">
+                    </span>
+                </div>
+            </div>
+
+            <div style="font-weight:700; font-size:0.9rem; margin:4px 0 1px; color:#1e2b3a;">
+                The Charge Reports of taking over/making over are submitted for information and necessary action to:-
+            </div>
+            <ol class="dept-list">
+                <li>District Account Officer Khushab</li>
+                <li>The Secretary, Government of the Punjab, Education Department, Lahore.</li>
+                <li>D.P.I. (Schools/Colleges) Lahore.</li>
+                <li>The Executive District Education Officer Khushab.</li>
+                <li>The District Education Officer (S.E) Khushab.</li>
+            </ol>
+
+            <div class="row" style="margin-top:4px;">
+                <strong>On</strong>
+                <span class="line-input gap-sm">
+                    <input type="text" placeholder="date" style="min-width:110px;">
+                </span>
+                <strong>forwarded a Certificate declaring that the charge of the</strong>
+                <span class="line-input" style="min-width:400px;">
+                    <input type="text" placeholder="charge / office" style="min-width:360px;">
+                </span>
+            </div>
+            <div class="row">
+                <strong>has been taken over/made over by</strong>
+                <span class="line-input" style="min-width:300px;">
+                    <input type="text" placeholder="name of officer" style="min-width:270px;">
+                </span>
+            </div>
+            <div class="row">
+                <strong>after noon / fore noon on</strong>
+                <span class="line-input" style="min-width:200px;">
+                    <input type="text" placeholder="date" style="min-width:170px;">
+                </span>
+            </div>
+
+            <div class="final-sig">
+                <div class="sig-box">
+                    (Signature with seal)
+                    <input type="text" placeholder="signature & seal">
+                </div>
+            </div>
+
+            <div class="footnote">
+                All fields editable • Click the print button to export as PDF or hard copy.
             </div>
         </div>
-
-        <div style="margin-top: 25px; font-size: 13px; font-weight: bold;">
-            Countersignature of District Education Officer (SE)
-        </div>
-
-        <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
-        </div>
-    </section>
-
-    <!-- MULTI-YEAR RESULT COMPARISON INPUT PANEL -->
-    <section class="panel-section no-print" id="comparison-controls">
-        <h2>Result Comparison Data Entry & Backup</h2>
-        <p style="font-size: 13px; color: #555;">Manage rows and use JSON Backup & Restore to secure or load all your records instantly.</p>
-
-        <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 5px;">
-            <button type="button" class="add-row-btn" onclick="addYearRow()">+ Add Year</button>
-            <button type="button" class="backup-btn" onclick="backupToJson()">📥 Backup All Data (JSON)</button>
-            <button type="button" class="restore-btn" onclick="document.getElementById('restore-file').click()">📤 Restore All Data (JSON)</button>
-        </div>
-
-        <table class="comparison-table-input">
-            <thead>
-                <tr>
-                    <th>Year</th>
-                    <th>Subject / Class</th>
-                    <th>Appeared</th>
-                    <th>Passed</th>
-                    <th>Failed (Auto)</th>
-                    <th>School % (Auto)</th>
-                    <th>Board % (Manual)</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="input-table-body"></tbody>
-        </table>
-
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button type="button" class="print-btn" style="margin-top:0;" onclick="printComparison()">Print Report (A4)</button>
-        </div>
-    </section>
-
-    <!-- MULTI-YEAR COMPARISON PRINTABLE REPORT -->
-    <section class="comparison-report" id="comparison-report" style="display:none;">
-        <h2>RESULT COMPARISON REPORT</h2>
-        <h3 id="out-report-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
-        <div class="report-meta">Comparison of Annual Examination Results</div>
-
-        <table class="comparison-table">
-            <thead>
-                <tr>
-                    <th>Year</th>
-                    <th>Subject / Class</th>
-                    <th>Appeared</th>
-                    <th>Passed</th>
-                    <th>Failed</th>
-                    <th>School Pass %</th>
-                    <th>Board Pass %</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="report-table-body"></tbody>
-        </table>
-
-        <p style="font-size: 13px; margin-top: 20px;">This comparative statement reflects the academic performance and standard of instruction maintained at the institution over consecutive years in comparison with the BISE results.</p>
-
-        <div style="margin-top:40px; display:flex; justify-content:space-between; gap:30px;">
-            <div style="text-align:center; min-width:190px; font-size:13px;">_________________________<br>Prepared By</div>
-            <div style="text-align:center; min-width:190px; font-size:13px;"><span class="sync-head-title">HEADMASTER</span><br><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></div>
-        </div>
-
-        <div class="brand-footer">
-            <strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082
-        </div>
-    </section>
-
-    <!-- 1. NO INQUIRY CERTIFICATE -->
-    <div class="certificate-page">
-        <div class="header-box">
-            <h2 class="sync-office-title">Office of the Headmaster</h2>
-            <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
-        </div>
-        <div class="cert-title">No Inquiry / No Punishment Certificate</div>
-        <div class="cert-body">
-            <p><strong>TO WHOM IT MAY CONCERN</strong></p>
-            <p style="margin-top: 10px;">
-                It is certified that particulars of <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, Designation: <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>), CNIC No. <span class="sync-cnic">36302-1234567-1</span>, currently working at <strong class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></strong> are as under:
-            </p>
-            <ol>
-                <li>Certify that no inquiry is pending against <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span> according to this office record.</li>
-                <li>Has no audit paras, draft paras, or financial recovery pending against the employee.</li>
-                <li>Certify that no Punishment was given to <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span> according to this office record.</li>
-                <li>Has no judicial or court case pending against him in any court of law.</li>
-            </ol>
-            <p style="margin-top: 15px;">This certificate is issued for promotion dossier and official record upon his request.</p>
-        </div>
-        <div class="signature-section">
-            <p><span class="sync-head-title">HEADMASTER</span></p>
-            <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
-        </div>
-        <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
     </div>
 
-    <!-- 2. NO DEMAND & NO AUDIT PARAS CERTIFICATE -->
-    <div class="certificate-page">
-        <div class="header-box">
-            <h2 class="sync-office-title">Office of the Headmaster</h2>
-            <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
+    <!-- ================================================================
+         TAB 6: NON-GAZETTED (URDU) RELIEVING & JOINING REPORT
+         ================================================================ -->
+    <div id="pane-non-gazetted" class="tab-pane">
+        <div class="report-print-bar no-print">
+            <button class="print-btn" onclick="printNonGazetted()">🖨️ Print Non-Gazetted (Urdu) Report</button>
         </div>
-        <div class="cert-title">No Demand & No Audit Paras Certificate</div>
-        <div class="cert-body">
-            <p><strong>TO WHOM IT MAY CONCERN</strong></p>
-            <p style="margin-top: 10px;">
-                It is certified that as per available record of this institution, particulars of <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, Designation: <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>), at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span>:
-            </p>
-            <ol>
-                <li><strong>NO DEMAND CERTIFICATE:</strong> Certify that nothing is outstanding against <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span> according to this office record.</li>
-                <li><strong>NO AUDIT PARAS CERTIFICATE:</strong> Certify that no audit Paras is against <span class="sync-name">MUHAMMAD SHAHID</span> at <span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span> according to this office record.</li>
-            </ol>
-            <p style="margin-top: 15px;">Further, no advance/loan recovery or overpayment is outstanding against the employee’s official account.</p>
-        </div>
-        <div class="signature-section">
-            <p><span class="sync-head-title">HEADMASTER</span></p>
-            <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
-        </div>
-        <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
-    </div>
 
-    <!-- 3. REGULAR SERVICE CERTIFICATE -->
-    <div class="certificate-page">
-        <div class="header-box">
-            <h2 class="sync-office-title">Office of the Headmaster</h2>
-            <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
-        </div>
-        <div class="cert-title">Regular Service & Verification Certificate</div>
-        <div class="cert-body">
-            <p><strong>TO WHOM IT MAY CONCERN</strong></p>
-            <p style="margin-top: 10px;">
-                It is certified that <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong> working at <strong class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></strong>, is a regular employee of the School Education Department, Government of the Punjab. The verified service details are as under:
-            </p>
-            <ul style="list-style-type: none; padding-left: 0; line-height: 1.8;">
-                <li><strong>Designation &amp; Scale:</strong> <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>)</li>
-                <li><strong>CNIC Number:</strong> <span class="sync-cnic">36302-1234567-1</span></li>
+        <div class="report-sheet urdu-sheet print-target">
+            <div class="header-line">
+                <span>از دفتر ہیڈ ماسٹر / ہیڈ مسٹریس گورنمنٹ &nbsp;........................ سکول &nbsp;........................ ضلع</span>
+                <span>نمبر &nbsp;........................ تاریخ &nbsp;........................</span>
+            </div>
+
+            <div class="title-main">رپورٹ حاضری / افراغت</div>
+
+            <div class="field-row">
+                <span class="num">①</span>
+                <span class="label">نام معلم / معلمہ</span>
+                <span class="line-input" style="flex:1 1 300px;"><input type="text" placeholder="...................."></span>
+                <span class="num">②</span>
+                <span class="label">ولدیت</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">③</span>
+                <span class="label">تعلیمی / فکری قابلیت</span>
+                <span class="line-input" style="flex:1 1 300px;"><input type="text" placeholder="...................."></span>
+                <span class="num">④</span>
+                <span class="label">عہدہ</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">⑤</span>
+                <span class="label">موجودہ تعیناتی کی تاریخ</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+                <span class="num">⑥</span>
+                <span class="label">گریڈ / سینئارٹی لسٹ نمبر</span>
+                <span class="line-input" style="flex:1 1 150px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">⑦</span>
+                <span class="label">موجودہ عہدے پر تقرری کی تاریخ</span>
+                <span class="line-input" style="flex:1 1 150px;"><input type="text" placeholder="...................."></span>
+                <span class="num">⑧</span>
+                <span class="label">مستقل / غیر مستقل</span>
+                <span class="line-input" style="flex:1 1 150px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">⑨</span>
+                <span class="label">تاریخ پیدائش (ہندسوں میں)</span>
+                <span class="line-input" style="flex:1 1 150px;"><input type="text" placeholder="...................."></span>
+                <span class="num">⑩</span>
+                <span class="label">(لفظوں میں)</span>
+                <span class="line-input" style="flex:1 1 150px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">⑪</span>
+                <span class="label">نام سکول جہاں سے تبادلہ ہوا</span>
+                <span class="line-input" style="flex:1 1 300px;"><input type="text" placeholder="...................."></span>
+                <span class="num">⑫</span>
+                <span class="label">تاریخ اور وقت فراغت</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">⑬</span>
+                <span class="label">سکول جس میں تبادلہ ہوا</span>
+                <span class="line-input" style="flex:1 1 300px;"><input type="text" placeholder="...................."></span>
+                <span class="num">⑭</span>
+                <span class="label">تاریخ اور وقت حاضری</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">⑮</span>
+                <span class="label">موجودہ گریڈ</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+                <span class="num">⑯</span>
+                <span class="label">تاریخ حصول رخصت</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">⑰</span>
+                <span class="label">موجودہ تنخواہ</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+                <span class="num">⑱</span>
+                <span class="label">تاریخ آخری ترقی</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">⑲</span>
+                <span class="label">کٹوتیاں: جی۔پی۔ فنڈ</span>
+                <span class="line-input" style="flex:1 1 100px;"><input type="text" placeholder="............"></span>
+                <span class="label">بہبود فنڈ</span>
+                <span class="line-input" style="flex:1 1 100px;"><input type="text" placeholder="............"></span>
+                <span class="label">ویلفیئر فنڈ</span>
+                <span class="line-input" style="flex:1 1 100px;"><input type="text" placeholder="............"></span>
+                <span class="label">وغیرہ</span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">⑳</span>
+                <span class="label">نمبر کھاتہ و تاریخ</span>
+                <span class="line-input" style="flex:1 1 300px;"><input type="text" placeholder="...................."></span>
+                <span class="num">㉑</span>
+                <span class="label">وجہ تبادلہ</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row">
+                <span class="num">㉒</span>
+                <span class="label">تنخواہ کس سکول سے برآمد ہوگی</span>
+                <span class="line-input" style="flex:1 1 200px;"><input type="text" placeholder="...................."></span>
+                <span class="num">㉓</span>
+                <span class="label">گھر کا پتہ</span>
+                <span class="line-input" style="flex:1 1 250px;"><input type="text" placeholder="...................."></span>
+            </div>
+
+            <div class="field-row" style="margin-top:6px;">
+                <span class="num">㉔</span>
+                <span class="label">رپورٹ متعلقہ چارج</span>
+                <span class="line-input" style="flex:1 1 500px;"><input type="text" placeholder="................................................................................"></span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="sig-area">
+                <div class="sig-item">
+                    مہر و دستخط ہیڈ ماسٹر / ہیڈ مسٹریس
+                    <input type="text" placeholder="signature & seal">
+                </div>
+                <div class="sig-item">
+                    نمبر &nbsp;..................... تاریخ &nbsp;.....................
+                    <input type="text" placeholder="date">
+                </div>
+            </div>
+
+            <div class="footer-note">
+                رپورٹ برائے اطلاع اور مناسب کارروائی پیش خدمت ہے
+            </div>
+
+            <ul class="list-dept">
+                <li>جناب ڈی۔ای۔او صاحب</li>
+                <li>جناب ڈیپٹی ڈی۔ای۔او صاحب</li>
+                <li>جناب ہیڈ ماسٹر / ہیڈ مسٹریس صاحب</li>
+                <li>جناب ڈسٹرکٹ اکاؤنٹس آفیسر صاحب ضلع</li>
+                <li>جناب ڈائریکٹر جنرل پنجاب لاہور</li>
             </ul>
-            <p style="margin-top: 10px;">The employee’s service record is clean, satisfactory, and continuous to date without any interruption or unauthorized absence.</p>
+
+            <div style="display:flex; justify-content:flex-end; margin-top:6px;">
+                <div class="sig-item" style="min-width:200px;">
+                    دستخط ہیڈ ماسٹر / ہیڈ مسٹریس
+                    <input type="text" placeholder="signature">
+                </div>
+            </div>
+
+            <div class="footnote" style="margin-top:auto; text-align:center; font-size:0.7rem; color:#7a8a9e; border-top:1px dotted #b0bccb; padding-top:3px; font-family:'Segoe UI',Arial,sans-serif;">
+                تمام خانے قابل تدوین ہیں • پرنٹ بٹن سے PDF یا ہارڈ کاپی حاصل کریں۔
+            </div>
         </div>
-        <div class="signature-section">
-            <p><span class="sync-head-title">HEADMASTER</span></p>
-            <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
-        </div>
-        <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
     </div>
 
-    <!-- 4. NO LPR / NO OPTION CERTIFICATE -->
-    <div class="certificate-page">
-        <div class="header-box">
-            <h2 class="sync-office-title">Office of the Headmaster</h2>
-            <h3 class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></h3>
-        </div>
-        <div class="cert-title">No LPR / No Option Certificate</div>
-        <div class="cert-body">
-            <p><strong>TO WHOM IT MAY CONCERN</strong></p>
-            <p style="margin-top: 10px;">
-                It is certified that <strong><span class="sync-name">MUHAMMAD SHAHID</span></strong>, Designation: <span class="sync-designation">SST (Computer Science)</span> (BPS-<span class="sync-bps">16</span>), currently working at <strong class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></strong>:
-            </p>
-            <ol>
-                <li>The employee has <strong>NOT</strong> applied for Leave Preparatory to Retirement (LPR).</li>
-                <li>The employee has <strong>NOT</strong> opted for Premature or Voluntary Retirement.</li>
-                <li>The employee is actively performing his official duties on a regular basis at this institution.</li>
-                <li>The employee has no intention to proceed on LPR in the near future and will complete his full length of service.</li>
-            </ol>
-            <p style="margin-top: 15px;">This certificate is issued upon his request for the compilation of his promotion dossier.</p>
-        </div>
-        <div class="signature-section">
-            <p><span class="sync-head-title">HEADMASTER</span></p>
-            <p><span class="sync-school"><span class="sync-school-name">Govt. High School 175/9-L</span> <span class="sync-tehsil">Tehsil Chichawatni</span> <span class="sync-district">District Sahiwal</span></span></p>
-        </div>
-        <div class="brand-footer"><strong>GM TECH SOLUTIONS</strong> | WhatsApp: +92 333 6283082</div>
-    </div>
-
+    <!-- ================================================================
+         JAVASCRIPT – Dossier Logic + Tab Switching + Print Functions
+         ================================================================ -->
     <script>
+        /* ==============================================================
+           DOSSIER DATA
+           ============================================================== */
         let synopsisData = [
-            { period: '21-06-1989\nTo\n31-12-1989', post: 'SST CS', integrity: '', assessment: '', remarks: 'Reporting Officer has been expired.', adverse: '', promotion: '' },
+            { period: '21-06-1989\nTo\n31-12-1989', post: 'SST CS', integrity: '', assessment: '', remarks: 'Reporting Officer has expired.', adverse: '', promotion: '' },
             { period: '01-01-1995\nTo\n31-12-1995', post: 'SST CS', integrity: 'Honest', assessment: 'Good', remarks: 'His Work and conduct is Excellent.', adverse: 'Nil', promotion: 'Fit for promotion in his turn.' },
             { period: '01-01-2023\nTo\nPresent', post: 'SST CS', integrity: 'Honest', assessment: 'Good', remarks: 'Work and conduct excellent.', adverse: 'Nil', promotion: 'Fit for promotion in his turn.' }
         ];
@@ -730,16 +1201,27 @@
             "CEO": "Office of the CEO"
         };
 
-        // ---------- DATE FORMATTING HELPERS ----------
-        // <input type="date"> stores YYYY-MM-DD; we display DD-MM-YYYY on documents.
+        /* ==============================================================
+           DATE HELPERS
+           ============================================================== */
         function formatDate(isoDate) {
             if (!isoDate) return '';
             const parts = isoDate.split('-');
-            if (parts.length !== 3) return isoDate; // not ISO — return as-is
-            return parts[2] + '-' + parts[1] + '-' + parts[0]; // YYYY-MM-DD → DD-MM-YYYY
+            if (parts.length !== 3) return isoDate;
+            return parts[2] + '-' + parts[1] + '-' + parts[0];
         }
 
-        // ---------- SYNOPSIS ----------
+        function toIsoDate(dateStr) {
+            if (!dateStr) return '';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+            const m = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+            if (m) return m[3] + '-' + m[2] + '-' + m[1];
+            return '';
+        }
+
+        /* ==============================================================
+           SYNOPSIS
+           ============================================================== */
         function renderSynopsisTable() {
             let html = '';
             synopsisData.forEach((item, index) => {
@@ -756,7 +1238,8 @@
                     </tr>
                 `;
             });
-            document.getElementById('synopsis-input-tbody').innerHTML = html;
+            const tbody = document.getElementById('synopsis-input-tbody');
+            if (tbody) tbody.innerHTML = html;
             syncSynopsisReport();
         }
 
@@ -790,10 +1273,13 @@
                     </tr>
                 `;
             });
-            document.getElementById('synopsis-report-tbody').innerHTML = html;
+            const tbody = document.getElementById('synopsis-report-tbody');
+            if (tbody) tbody.innerHTML = html;
         }
 
-        // ---------- COMPARISON ----------
+        /* ==============================================================
+           COMPARISON
+           ============================================================== */
         function renderTable() {
             let inputHTML = '';
             yearData.forEach((item, index) => {
@@ -815,7 +1301,8 @@
                     </tr>
                 `;
             });
-            document.getElementById('input-table-body').innerHTML = inputHTML;
+            const tbody = document.getElementById('input-table-body');
+            if (tbody) tbody.innerHTML = inputHTML;
             syncComparisonReport();
         }
 
@@ -858,21 +1345,20 @@
             const target = HEAD_TO_OFFICE[headTitleVal];
             if (target) {
                 officeTitleSelect.value = target;
-                if (officeTitleSelect.value !== target) {
-                    console.warn("No <option> matches office title:", target);
-                }
             }
             syncData();
         }
 
-        // ---------- BACKUP / RESTORE ----------
+        /* ==============================================================
+           BACKUP / RESTORE
+           ============================================================== */
         function backupToJson() {
             const allData = {
                 employeeName: document.getElementById('input-name').value,
                 fatherName: document.getElementById('input-father').value,
-                dob: document.getElementById('input-dob').value,                // ISO YYYY-MM-DD
-                doappt: document.getElementById('input-doappt').value,          // ISO YYYY-MM-DD
-                dopresent: document.getElementById('input-dopresent').value,    // ISO YYYY-MM-DD
+                dob: document.getElementById('input-dob').value,
+                doappt: document.getElementById('input-doappt').value,
+                dopresent: document.getElementById('input-dopresent').value,
                 designation: document.getElementById('input-designation').value,
                 bps: document.getElementById('input-bps').value,
                 cnic: document.getElementById('input-cnic').value,
@@ -883,7 +1369,7 @@
                 tehsil: document.getElementById('input-tehsil').value,
                 district: document.getElementById('input-district').value,
                 appNo: document.getElementById('app-input-no').value,
-                appDate: document.getElementById('app-input-date').value,      // ISO YYYY-MM-DD
+                appDate: document.getElementById('app-input-date').value,
                 appRecipient: document.getElementById('app-input-recipient').value,
                 appTargetRank: document.getElementById('app-input-target-rank').value,
                 appEmis: document.getElementById('app-input-emis').value,
@@ -910,7 +1396,6 @@
 
                         if (parsedData.employeeName) document.getElementById('input-name').value = parsedData.employeeName;
                         if (parsedData.fatherName) document.getElementById('input-father').value = parsedData.fatherName;
-                        // Dates: accept either YYYY-MM-DD (new format) or DD-MM-YYYY (old backups)
                         if (parsedData.dob) document.getElementById('input-dob').value = toIsoDate(parsedData.dob);
                         if (parsedData.doappt) document.getElementById('input-doappt').value = toIsoDate(parsedData.doappt);
                         if (parsedData.dopresent) document.getElementById('input-dopresent').value = toIsoDate(parsedData.dopresent);
@@ -956,20 +1441,15 @@
             }
         }
 
-        // Convert DD-MM-YYYY (old format) to YYYY-MM-DD (ISO, for date input)
-        function toIsoDate(dateStr) {
-            if (!dateStr) return '';
-            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr; // already ISO
-            const m = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})$/);
-            if (m) return m[3] + '-' + m[2] + '-' + m[1];
-            return ''; // unknown format → clear the date input
-        }
-
-        // ---------- GLOBAL SYNC ----------
+        /* ==============================================================
+           GLOBAL SYNC
+           ============================================================== */
         function syncData() {
-            const name = document.getElementById('input-name').value;
+            const nameEl = document.getElementById('input-name');
+            if (!nameEl) return;
+
+            const name = nameEl.value;
             const father = document.getElementById('input-father').value;
-            // Read ISO dates from input, but DISPLAY as DD-MM-YYYY on documents
             const dob = formatDate(document.getElementById('input-dob').value);
             const doappt = formatDate(document.getElementById('input-doappt').value);
             const dopresent = formatDate(document.getElementById('input-dopresent').value);
@@ -1012,32 +1492,32 @@
             document.querySelectorAll('.sync-office-title').forEach(el => el.textContent = officeTitle);
         }
 
+        /* ==============================================================
+           TAB SWITCHING (Unified for all 6 tabs)
+           ============================================================== */
         function switchTab(tab) {
-            const certificates = tab === 'certificates';
-            const application = tab === 'application';
-            const synopsis = tab === 'synopsis';
-            const comparison = tab === 'comparison';
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
 
-            document.getElementById('certificate-controls').classList.toggle('hidden-view', !certificates);
-            document.querySelectorAll('.certificate-page').forEach(el => el.classList.toggle('hidden-view', !certificates));
+            const paneMap = {
+                'certificates': { pane: 'pane-certificates', btn: 'tab-certificates' },
+                'application':  { pane: 'pane-application',  btn: 'tab-application' },
+                'synopsis':     { pane: 'pane-synopsis',     btn: 'tab-synopsis' },
+                'comparison':   { pane: 'pane-comparison',   btn: 'tab-comparison' },
+                'gazetted':     { pane: 'pane-gazetted',     btn: 'tab-gazetted' },
+                'non-gazetted': { pane: 'pane-non-gazetted', btn: 'tab-non-gazetted' }
+            };
 
-            document.getElementById('application-controls').style.display = application ? 'block' : 'none';
-            document.getElementById('application-report').style.display = application ? 'block' : 'none';
-
-            document.getElementById('synopsis-controls').style.display = synopsis ? 'block' : 'none';
-            document.getElementById('synopsis-report').style.display = synopsis ? 'block' : 'none';
-
-            document.getElementById('comparison-controls').style.display = comparison ? 'block' : 'none';
-            document.getElementById('comparison-report').style.display = comparison ? 'block' : 'none';
-
-            document.getElementById('tab-certificates').classList.toggle('active', certificates);
-            document.getElementById('tab-application').classList.toggle('active', application);
-            document.getElementById('tab-synopsis').classList.toggle('active', synopsis);
-            document.getElementById('tab-comparison').classList.toggle('active', comparison);
-
-            document.body.classList.remove('print-certificates', 'print-application', 'print-synopsis', 'print-comparison');
+            const target = paneMap[tab];
+            if (target) {
+                document.getElementById(target.pane).classList.add('active');
+                document.getElementById(target.btn).classList.add('active');
+            }
         }
 
+        /* ==============================================================
+           COMPARISON REPORT SYNC
+           ============================================================== */
         function syncComparisonReport() {
             let tbodyHTML = '';
             yearData.forEach((item) => {
@@ -1072,44 +1552,48 @@
                     </tr>
                 `;
             });
-            document.getElementById('report-table-body').innerHTML = tbodyHTML;
+            const tbody = document.getElementById('report-table-body');
+            if (tbody) tbody.innerHTML = tbodyHTML;
         }
 
+        /* ==============================================================
+           PRINT FUNCTIONS
+           ============================================================== */
         function printCertificates() {
-            document.body.classList.remove('print-application', 'print-synopsis', 'print-comparison');
-            document.body.classList.add('print-certificates');
             window.print();
         }
 
         function printApplication() {
             syncData();
-            document.body.classList.remove('print-certificates', 'print-synopsis', 'print-comparison');
-            document.body.classList.add('print-application');
             window.print();
         }
 
         function printSynopsis() {
             syncSynopsisReport();
-            document.body.classList.remove('print-certificates', 'print-application', 'print-comparison');
-            document.body.classList.add('print-synopsis');
             window.print();
         }
 
         function printComparison() {
             syncComparisonReport();
-            document.body.classList.remove('print-certificates', 'print-application', 'print-synopsis');
-            document.body.classList.add('print-comparison');
             window.print();
         }
 
-        window.addEventListener('afterprint', function () {
-            document.body.classList.remove('print-certificates', 'print-application', 'print-synopsis', 'print-comparison');
-        });
+        function printGazetted() {
+            window.print();
+        }
 
-        // Initialize
-        syncData();
-        renderSynopsisTable();
-        renderTable();
+        function printNonGazetted() {
+            window.print();
+        }
+
+        /* ==============================================================
+           INITIALIZE (DOM Ready Guarantee)
+           ============================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSynopsisTable();
+            renderTable();
+            syncData();
+        });
     </script>
 </body>
 </html>
