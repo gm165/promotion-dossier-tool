@@ -164,6 +164,28 @@
         .synopsis-table, .comparison-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }
         .synopsis-table th, .synopsis-table td, .comparison-table th, .comparison-table td { border: 1px solid #475569; padding: 6px; text-align: left; vertical-align: top; }
         .synopsis-table th, .comparison-table th { background: #e2e8f0; text-align: center; }
+        .comparison-table td { text-align: center; vertical-align: middle; }
+
+        .comparison-report h2,
+        .comparison-report h3,
+        .comparison-report .report-meta {
+            text-align: center;
+        }
+        .comparison-report h2 {
+            margin: 0 0 6px 0;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+        .comparison-report h3 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .comparison-report .report-meta {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
 
         .bio-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; }
         .bio-table td { border: 1px solid #475569; padding: 5px 8px; vertical-align: middle; }
@@ -1675,6 +1697,37 @@
             const tbody = document.getElementById('input-table-body');
             if (tbody) tbody.innerHTML = inputHTML;
             syncComparisonReport();
+        }
+
+        function syncComparisonReport() {
+            let html = '';
+            yearData.forEach(item => {
+                const appeared = Math.max(0, parseInt(item.appeared) || 0);
+                const passed = Math.max(0, parseInt(item.passed) || 0);
+                const fail = Math.max(0, appeared - passed);
+                const srate = appeared > 0 ? (passed / appeared) * 100 : 0;
+                const board = parseFloat(item.board) || 0;
+                let status = '—';
+                if (appeared > 0) {
+                    if (srate > board) status = 'Above Board';
+                    else if (srate < board) status = 'Below Board';
+                    else status = 'Equal to Board';
+                }
+                html += `
+                    <tr>
+                        <td style="text-align:center;">${item.year || '—'}</td>
+                        <td style="text-align:center;">${item.subject || '—'}</td>
+                        <td style="text-align:center;">${appeared}</td>
+                        <td style="text-align:center;">${passed}</td>
+                        <td style="text-align:center;">${fail}</td>
+                        <td style="text-align:center;">${srate.toFixed(2)}%</td>
+                        <td style="text-align:center;">${board.toFixed(2)}%</td>
+                        <td style="text-align:center;">${status}</td>
+                    </tr>
+                `;
+            });
+            const tbody = document.getElementById('report-table-body');
+            if (tbody) tbody.innerHTML = html;
         }
 
         function addYearRow() {
